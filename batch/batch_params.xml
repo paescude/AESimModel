@@ -1,0 +1,113 @@
+<?xml version="1.0"?>
+<sweep runs="1">
+	<parameter name="initialPatients" type= "constant" constant_type="number" value="30" ></parameter> 
+	<parameter name="initialDoctors" type= "constant" constant_type="number" value="2" /> 
+	<parameter name="initialSHOs" type= "constant" constant_type="number" value="9" />
+	<parameter name="initialConsultants" type= "constant" constant_type="number" value="1" />
+	<parameter name="initialNurses" type= "constant" constant_type="number" value="1" />
+	
+	<parameter name="patientTimeDoctor" type= "constant" constant_type="number" value="6" /> 
+	<parameter name="PatientInterarrivalTime" type= "constant" constant_type="number" value="4" /> 
+	<parameter name="endTime" type= "constant" constant_type="number" value="100" />
+	<parameter name="resCubicles" type= "constant" constant_type="number" value="3" />
+	<parameter name="minCubicles" type= "constant" constant_type="number" value="5" />
+	<parameter name="mayorCubicles" type= "constant" constant_type="number" value="5" />
+	<parameter name="triageCubicles" type= "constant" constant_type="number" value="1" />
+	<parameter name="trolleys" type= "constant" constant_type="number" value="10" />
+	<parameter name="xRayCapacity" type= "constant" constant_type="number" value="1" />
+	<parameter name="testRoom" type= "constant" constant_type="number" value="2" />
+	<parameter name="clerk_count" type= "constant" constant_type="number" value="2" />
+	<parameter name="percentWalkIn" type= "constant" constant_type="number" value="75" />
+	<parameter name="percentWalkIn" type= "constant" constant_type="number" value="25" />
+	<parameter name="randomSeed" type= "number" start="1" end="5" step="1" ></parameter>
+	
+	<parameter name="registrationTimeMin" type= "constant" constant_type="number" value="3.0" />
+	<parameter name="registrationTimeMax" type= "constant" constant_type="number" value="8.0" />
+	<parameter name="registrationTimeModa" type= "constant" constant_type="number" value="5.0" />
+	<fstAssessmentSHO>
+		<parameter name="FstAssessmentSHOTriage1Min" type= "constant" constant_type="number" value="5.0" />
+		<parameter name="FstAssessmentSHOTriage1Moda" type= "constant" constant_type="number" value="20.0" />
+		<parameter name="FstAssessmentSHOTriage1Max" type= "constant" constant_type="number" value="55.0" />
+		
+		<parameter name="FstAssessmentSHOTriage2Min" type= "constant" constant_type="number" value="5.0" />
+		<parameter name="FstAssessmentSHOTriage2Moda" type= "constant" constant_type="number" value="20.0" />
+		<parameter name="FstAssessmentSHOTriage2Max" type= "constant" constant_type="number" value="55.0" />
+		
+		<parameter name="FstAssessmentSHOTriage3Min" type= "constant" constant_type="number" value="1.0" />
+		<parameter name="FstAssessmentSHOTriage3Moda" type= "constant" constant_type="number" value="30.0" />
+		<parameter name="FstAssessmentSHOTriage3Max" type= "constant" constant_type="number" value="38.0" />
+		
+		<parameter name="FstAssessmentSHOTriage4Min" type= "constant" constant_type="number" value="1.0" />
+		<parameter name="FstAssessmentSHOTriage4Moda" type= "constant" constant_type="number" value="30.0" />
+		<parameter name="FstAssessmentSHOTriage4Max" type= "constant" constant_type="number" value="38.0" />
+		
+		<parameter name="FstAssessmentSHOTriage5Min" type= "constant" constant_type="number" value="1.0" />
+		<parameter name="FstAssessmentSHOTriage5Moda" type= "constant" constant_type="number" value="15.0" />
+		<parameter name="FstAssessmentSHOTriage5Max" type= "constant" constant_type="number" value="27.0" />
+	</fstAssessmentSHO>
+	<fstAssessmentConsultant>
+		<parameter name="FstAssessmentConsultantTriage1Min" type= "constant" constant_type="number" value="5.0" />
+		<parameter name="FstAssessmentConsultantTriage1Moda" type= "constant" constant_type="number" value="15.0" />
+		<parameter name="FstAssessmentConsultantTriage1Max" type= "constant" constant_type="number" value="45.0" />
+		
+		<parameter name="FstAssessmentConsultantTriage2Min" type= "constant" constant_type="number" value="5.0" />
+		<parameter name="FstAssessmentConsultantTriage2Moda" type= "constant" constant_type="number" value="15.0" />
+		<parameter name="FstAssessmentConsultantTriage2Max" type= "constant" constant_type="number" value="45.0" />
+		
+		<parameter name="FstAssessmentConsultantTriage3Min" type= "constant" constant_type="number" value="1.0" />
+		<parameter name="FstAssessmentConsultantTriage3Moda" type= "constant" constant_type="number" value="24.0" />
+		<parameter name="FstAssessmentConsultantTriage3Max" type= "constant" constant_type="number" value="30.0" />
+		
+		<parameter name="FstAssessmentConsultantTriage4Min" type= "constant" constant_type="number" value="1.0" />
+		<parameter name="FstAssessmentConsultantTriage4Moda" type= "constant" constant_type="number" value="24.0" />
+		<parameter name="FstAssessmentConsultantTriage4Max" type= "constant" constant_type="number" value="30.0" />
+		
+		<parameter name="FstAssessmentConsultantTriage5Min" type= "constant" constant_type="number" value="1.0" />
+		<parameter name="FstAssessmentConsultantTriage5Moda" type= "constant" constant_type="number" value="15.0" />
+		<parameter name="FstAssessmentConsultantTriage5Max" type= "constant" constant_type="number" value="27.0" />
+	</fstAssessmentConsultant>
+	<reassessmentSHO>
+		<parameter name="ReassessmentSHOTriage1Min" type= "constant" constant_type="number" value="1.0" />
+		<parameter name="ReassessmentSHOTriage1Moda" type= "constant" constant_type="number" value="8.0" />
+		<parameter name="ReassessmentSHOTriage1Max" type= "constant" constant_type="number" value="10.0" />
+		
+		<parameter name="ReassessmentSHOTriage2Min" type= "constant" constant_type="number" value="1.0" />
+		<parameter name="ReassessmentSHOTriage2Moda" type= "constant" constant_type="number" value="8.0" />
+		<parameter name="ReassessmentSHOTriage2Max" type= "constant" constant_type="number" value="10.0" />
+		
+		<parameter name="ReassessmentSHOTriage3Min" type= "constant" constant_type="number" value="1.0" />
+		<parameter name="ReassessmentSHOTriage3Moda" type= "constant" constant_type="number" value="22.0" />
+		<parameter name="ReassessmentSHOTriage3Max" type= "constant" constant_type="number" value="28.0" />
+		
+		<parameter name="ReassessmentSHOTriage4Min" type= "constant" constant_type="number" value="1.0" />
+		<parameter name="ReassessmentSHOTriage4Moda" type= "constant" constant_type="number" value="22.0" />
+		<parameter name="ReassessmentSHOTriage4Max" type= "constant" constant_type="number" value="28.0" />
+		
+		<parameter name="ReassessmentSHOTriage5Min" type= "constant" constant_type="number" value="1.0" />
+		<parameter name="ReassessmentSHOTriage5Moda" type= "constant" constant_type="number" value="15.0" />
+		<parameter name="ReassessmentSHOTriage5Max" type= "constant" constant_type="number" value="27.0" />
+	</reassessmentSHO>
+	<reassessmentConsultant>
+		<parameter name="ReassessmentConsultantTriage1Min" type= "constant" constant_type="number" value="1.0" />
+		<parameter name="ReassessmentConsultantTriage1Moda" type= "constant" constant_type="number" value="5.0" />
+		<parameter name="ReassessmentConsultantTriage1Max" type= "constant" constant_type="number" value="8.0" />
+		
+		<parameter name="ReassessmentConsultantTriage2Min" type= "constant" constant_type="number" value="1.0" />
+		<parameter name="ReassessmentConsultantTriage2Moda" type= "constant" constant_type="number" value="5.0" />
+		<parameter name="ReassessmentConsultantTriage2Max" type= "constant" constant_type="number" value="8.0" />
+		
+		<parameter name="ReassessmentConsultantTriage3Min" type= "constant" constant_type="number" value="1.0" />
+		<parameter name="ReassessmentConsultantTriage3Moda" type= "constant" constant_type="number" value="19.0" />
+		<parameter name="ReassessmentConsultantTriage3Max" type= "constant" constant_type="number" value="22.0" />
+		
+		<parameter name="ReassessmentConsultantTriage4Min" type= "constant" constant_type="number" value="1.0" />
+		<parameter name="ReassessmentConsultantTriage4Moda" type= "constant" constant_type="number" value="19.0" />
+		<parameter name="ReassessmentConsultantTriage4Max" type= "constant" constant_type="number" value="22.0" />
+		
+		<parameter name="ReassessmentConsultantTriage5Min" type= "constant" constant_type="number" value="1.0" />
+		<parameter name="ReassessmentConsultantTriage5Moda" type= "constant" constant_type="number" value="15.0" />
+		<parameter name="ReassessmentConsultantTriage5Max" type= "constant" constant_type="number" value="27.0" />
+	</reassessmentConsultant>
+	
+
+</sweep>
