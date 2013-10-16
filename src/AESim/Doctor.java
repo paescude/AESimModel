@@ -1320,9 +1320,8 @@ public class Doctor extends General {
 				}
 			}
 		}
-	
-	
-	else if (requiredAtWork == 1) {
+		
+		else if (requiredAtWork == 1) {
 			// TODO here if (this.isInShift() == false) didn't have {}, i put
 			// them but needs to be checked
 			if (this.isInShift() == false) {
@@ -1386,7 +1385,7 @@ public class Doctor extends General {
 	}
 	
 	
-	@Watch(watcheeClassName = "AESim.Patient", watcheeFieldNames = "wasFirstforAsses",triggerCondition = "$watchee.getNumWasFstForAssess()>0", scheduleTriggerPriority=90, whenToTrigger = WatcherTriggerSchedule.IMMEDIATE /*, pick=1*/)
+	@Watch(watcheeClassName = "AESim.Patient", watcheeFieldNames = "wasFirstforAsses", triggerCondition = "$watchee.getNumWasFstForAssess()>0", scheduleTriggerPriority=90, whenToTrigger = WatcherTriggerSchedule.IMMEDIATE /*, pick=1*/)
 	public void newPatientForInitAssessment(Patient watchedPatient) {
 		System.out.println("\n " + this.getId() + " watcher init, time: "
 				+ getTime());
@@ -1506,6 +1505,7 @@ public class Doctor extends General {
 					//add patient to bed:
 					System.out.println("method: start init assessment " +this.getId() + " will add to his patients in bed " + fstpatient.getId() );
 					this.myPatientsInBedAdd(fstpatient);
+					this.patientsInMultiTask.add(fstpatient);
 					double x = this.getX1MyNumPatientsSeen();
 					x++;
 					this.setX1MyNumPatientsSeen(x);					
@@ -1513,6 +1513,7 @@ public class Doctor extends General {
 					printElementsQueue(this.myPatientsInBedTime, " my patients in bed time" );
 					
 					this.setMultitask(true);
+					printElementsArray(this.patientsInMultiTask, " patients in multitasking");
 					//this.setAvailable(false);				
 					System.out.println(this.getId() + " is setting " + rAvailable.getId() + " available= false");
 					rAvailable.setAvailable(false);
@@ -1744,7 +1745,9 @@ public class Doctor extends General {
 		System.out.println(doctor.getId() + " will decide what to do next");
 		
 		System.out.println(this.getId() + " has finished fst assessment and  has removed " + patient.getId() + " from his multitasking.  " );
+		System.out.println("My multitasking factor is " + this.multiTaskingFactor);
 		printElementsArray(this.patientsInMultiTask, " patients in multitasking");
+		System.out.println(this.getId() + "has available = " + this.getAvailable());
 		//Para mover paciente de la lista de espera.
 		movePatientBedReassessment(doctor);
 		doctor.moveToDoctorsArea();
@@ -1963,9 +1966,11 @@ System.out.println(this.getId() + " is DOING reassessment to " + patientBackInBe
 		
 		
 		
-		this.patientsInMultiTask.add(fstpatient);
+		
 		System.out.println(this.getId() + " has started first assessment and  has added " + fstpatient.getId() + " to his multitasking.  " );
+		System.out.println("My multitasking factor is " + this.multiTaskingFactor);
 		printElementsArray(this.patientsInMultiTask, " patients in multitasking");
+		System.out.println(this.getId() + "has available = " + this.getAvailable());
 		
 
 	}
@@ -2067,14 +2072,17 @@ System.out.println(this.getId() + " is DOING reassessment to " + patientBackInBe
 						+ " this method is being called by " + this.getId());
 		this.patientsInMultiTask.remove(patient);
 		System.out.println(this.getId() + " has finished re-assessment and  has removed " + patient.getId() + " from his multitasking.  " );
+		doctor.setMultitask(false);
+		System.out.println("My multitasking factor is " + this.multiTaskingFactor);
 		printElementsArray(this.patientsInMultiTask, " patients in multitasking");
+		System.out.println(this.getId() + "has available = " + this.getAvailable());
 		
 		doctor.setMyResource(null);
 		patient.setMyResource(null);
 		patient.setIsInSystem(false);
 		doctor.myPatientsInBedRemove(patient);
 		patient.setMyDoctor(null);
-		doctor.setMultitask(false);
+		
 //		doctor.setAvailable(true);
 		
 		System.out.println("method end reassessment " + doctor.getId() + " is setting " + resourceToRelease.getId() + " available= true");
@@ -2145,7 +2153,9 @@ System.out.println(this.getId() + " is DOING reassessment to " + patientBackInBe
 		schedule.schedule(scheduleParams, action2);
 		this.patientsInMultiTask.add(fstpatient);
 		System.out.println(this.getId() + " has started re-assessment and  has added " + fstpatient.getId() + " to his multitasking.  " );
+		System.out.println("My multitasking factor is " + this.multiTaskingFactor);
 		printElementsArray(this.patientsInMultiTask, " patients in multitasking");
+		System.out.println(this.getId() + " has available = " + this.getAvailable());
 		System.out.println(fstpatient.getId()
 				+ " expected to end reassessment at " + timeEndService);
 
