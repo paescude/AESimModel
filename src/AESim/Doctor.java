@@ -993,6 +993,29 @@ public class Doctor extends General {
 								this.moveToDoctorsArea();
 							}
 						}
+					} else {
+						if (this.doctorType == "Consultant ") {
+							System.out
+									.println(this.getId()
+											+ " is consultant and is checking any other sho is available");
+							Doctor shoAvailable = checkForAnyAvailableDoctor();
+							if (shoAvailable == null) {
+
+								System.out
+										.println(this.getId()
+												+ " is SHO and is checking if start init assessment");
+								boolean isStartInitAssessment = this
+										.checkIfStartInitAssessment();
+								if (isStartInitAssessment == false) {
+									if (this.isAtDoctorArea == false) {
+										this.moveToDoctorsArea();
+									}
+								}
+
+							}
+
+						}
+
 					}
 				}
 			}
@@ -1003,6 +1026,20 @@ public class Doctor extends General {
 	}
 
 	
+	private Doctor checkForAnyAvailableDoctor() {
+		Doctor shoAvailable=null;
+		System.out.println(" checks if there is any sho available to start init assessment " );
+		for (Object sho : getContext().getObjects(Doctor.class)) {
+			Doctor shoToCheck= (Doctor) sho;
+			if (shoToCheck.getAvailable()){
+				shoAvailable= shoToCheck;
+				System.out.println(shoAvailable.getId() + " is available ");
+				break;
+			}
+		}		
+		return shoAvailable;
+	}
+
 	private Boolean checkIfStartInitAssessment() {
 		boolean isStartInitAssessment= false;
 		Patient fstpatient = null;
