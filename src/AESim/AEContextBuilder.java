@@ -68,7 +68,7 @@ public class AEContextBuilder implements ContextBuilder<Object> {
 		int nurseInitial = 5 ;
 		int clerkInitial = 2;
 		// int clerkInitial = (Integer) params.getValue("clerk_count");
-		int multiTSho=2;
+		int multiTSho=4;
 		int multiTConsultant=6;
 		
 		for (int i = 1; i <= clerkInitial; i++) {

@@ -954,6 +954,9 @@ public class Doctor extends General {
 					+ " is in shift and is available at " + getTime());
 			// this.decideWhatToDoNext();
 		}
+		else {
+			this.setAvailable(false);
+		}
 	}
 
 	// @ScheduledMethod(start=15, interval= 15, priority= 20)
@@ -974,6 +977,7 @@ public class Doctor extends General {
 	}
 
 	public void decideWhatToDoNext() {
+		System.out.println("when deciding what to do next, "+this.getId() + " num of patients in multitask: " +this.patientsInMultiTask.size() + ", multitask factor: "  + this.multiTaskingFactor);
 		if (this.patientsInMultiTask.size() < this.multiTaskingFactor) {
 			printTime();
 			System.out.println(this.getId() + " decides what to do next");
@@ -1025,6 +1029,9 @@ public class Doctor extends General {
 					}
 				}
 			}
+		}
+		else {
+			this.setAvailable(false);
 		}
 
 	}
@@ -1965,6 +1972,7 @@ public class Doctor extends General {
 		System.out.println(this.getId() + " is setting " + bedPatient.getId()
 				+ " available= false");
 		bedPatient.setAvailable(false);
+		this.patientsInMultiTask.add(patientBackInBed);
 		this.setMultitask(true);
 		// this.setAvailable(false);
 		if (this.available)
@@ -2224,7 +2232,6 @@ public class Doctor extends General {
 		EndReassessment action2 = new EndReassessment(doctor, fstpatient);
 
 		schedule.schedule(scheduleParams, action2);
-		this.patientsInMultiTask.add(fstpatient);
 		System.out.println(this.getId()
 				+ " has started re-assessment and  has added "
 				+ fstpatient.getId() + " to his multitasking.  ");
