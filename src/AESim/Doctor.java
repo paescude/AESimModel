@@ -1045,7 +1045,6 @@ public class Doctor extends General {
 	}
 
 	private Boolean checkIfStartInitAssessment() {
-<<<<<<< HEAD
 		/*
 		 * Prueba de branches
 		 */
@@ -1053,9 +1052,6 @@ public class Doctor extends General {
 		/*
 		 * Prueba 3
 		 */
-=======
-		boolean isStartInitAssessment= false;
->>>>>>> Refactor endFstAssessment method
 		Patient fstpatient = null;
 		Boolean flag = false;
 		// The head of the queue is at (x,y-1)
@@ -1652,41 +1648,8 @@ public class Doctor extends General {
 	public void endFstAssessment(Patient patient) {
 		System.out.println("\n \t\t END FIRST ASSESSMENT");
 		Doctor doctor = null;
-<<<<<<< HEAD
 		printTime();
 
-=======
-		printTime();		
-		doctor = chooseDocFstAssess(patient, doctor);
-		if (doctor != null) {
-			int totalProcess = patient.getTotalProcesses();
-			patient.setTotalProcesses(totalProcess+1);;
-			this.patientsInMultiTask.remove(patient);
-			doctor.setMultitask(false);			
-			//doctor decides what to do 
-			int route[] = decideTests(patient.getTriageNum());
-			// Choose a route. The patient could go to test or not.
-			chooseRoute(patient, doctor, route);
-		} else {
-			System.err
-					.println(" ERROR: something is wrong here, no doctor to end fst assessment with "
-							+ patient.getId());
-			//this.doEndFstAssessment(this, patient);
-		}
-		System.out.println(doctor.getId() + " will decide what to do next");		
-		System.out.println(this.getId() + " has finished fst assessment and  has removed " + patient.getId() + " from his multitasking.  " );
-		System.out.println("My multitasking factor is " + this.multiTaskingFactor);
-		printElementsArray(this.patientsInMultiTask, " patients in multitasking");
-		System.out.println(this.getId() + "has available = " + this.getAvailable());
-		//Para mover paciente de la lista de espera.
-		movePatientBedReassessment(doctor);
-		doctor.moveToDoctorsArea();
-		doctor.decideWhatToDoNext();
-
-	}
-
-	private Doctor chooseDocFstAssess(Patient patient, Doctor doctor) {
->>>>>>> Refactor endFstAssessment method
 		if (patient == null) {
 			System.err
 					.println("\n ERROR: Shouldn't be happening, patient is null at end of fst assessment");
@@ -1715,10 +1678,7 @@ public class Doctor extends General {
 					}
 			}
 		}
-		return doctor;
-	}
 
-<<<<<<< HEAD
 		if (doctor != null) {
 
 			int totalProcess = patient.getTotalProcesses();
@@ -1737,23 +1697,8 @@ public class Doctor extends General {
 				System.out.println("method end fst assessment " + this.getId()
 						+ " is setting " + resourceToRelease.getId()
 						+ " available= true");
-=======
-	private void chooseRoute(Patient patient, Doctor doctor, int[] route) {
-		if (route[0] == 0 && route[1] == 0) {
-			Resource resourceToRelease= patient.getMyResource();
-			this.removePatientFromDepartment(patient);
-			System.out.println("method end fst assessment "+this.getId() + " is setting " + resourceToRelease.getId() + " available= true");
-			resourceToRelease.setAvailable(true);
-		} else {
-			if(Math.random()<0.1 && patient.getTriageNum() != 5){
-				Resource resourceToRelease= patient.getMyResource();
-				System.out.println("method end fst assessment "+this.getId() + " is setting " + resourceToRelease.getId() + " available= true, becasue "+ patient.getId() + " does not wait for test in bed" );
->>>>>>> Refactor endFstAssessment method
 				resourceToRelease.setAvailable(true);
-				patient.setWaitInCublicle(false);
-				patient.setIsWaitingBedReassessment(1);
 			} else {
-<<<<<<< HEAD
 				needTest = true;
 				if (Math.random() < 0.1 && patient.getTriageNum() != 5) {
 					Resource resourceToRelease = patient.getMyResource();
@@ -1840,73 +1785,11 @@ public class Doctor extends General {
 				else if (route[0] == 0 && route[1] == 1) {
 					printTime();
 
-=======
-				Resource resourceToGo = patient.getMyResource();					
-				patient.setMyBedReassessment(resourceToGo);
-				patient.getMyBedReassessment().setAvailable(false);
-				resourceToGo.setWhoBlockedMe(patient);
-				System.out.println(patient.getId() + " has blocked " + resourceToGo.getId());
-				System.out.println(patient.getId() + " reserves "
-						+ patient.getMyBedReassessment().getId()
-						+ " as my bed reassessment ");
-			}			
-			patient.setMyDoctor(doctor);
-			printTime();
-			System.out.println(patient.getId()
-					+ " keeps in mind that his assigned doctor is  "
-					+ patient.getMyDoctor().getId());
-
-			doctor.setMyResource(null);
-			doctor.setMultitask(false);
-			// this.setAvailable(true);
-			printTime();
-			System.out.println("method: endFstAssessment" + doctor.getId()
-					+ " will remove from list of patients in bed "
-					+ patient.getId());
-			System.out.println(" method end fst assessment");
-
-			doctor.myPatientsInBedRemove(patient);
-
-			System.out.println(doctor.getId()
-					+ " will move to doctors area"
-					+ " method: endFstAssessment"
-					+ " this method is being called by " + this.getId());
-			System.out.println(doctor.getId()
-					+ " decides for patient's test");
-			System.out
-					.println(this.getId() + " decides for patient's test");
-			if (route[0] == 1) {
-				printTime();
-
-				System.out.println(patient.getId() + " needs Xray ");
-				System.out.println(patient.getId() + " goes to qXray");
-				patient.addToQ("qXRay ");
-				// patient.increaseTestCounterXray();
-				patient.setTotalNumTest(patient.getTotalNumTest() + 1);
-				System.out.println(doctor.getId()
-						+ " adds to list of patients in test "
-						+ patient.getId());
-				System.out.println(" method end First assessment"
-						+ doctor.getId()
-						+ " will add to his patients in test "
-						+ patient.getId());
-
-				doctor.myPatientsInTestAdd(patient);
-
-				printElementsArray(doctor.getMyPatientsInTests(),
-						" my patients in test ");
-
-				if (route[1] == 1) {
-					printTime();
-					patient.setNextProc(1);
->>>>>>> Refactor endFstAssessment method
 					System.out.println(patient.getId()
-							+ " will need test after Xray");
-					// patient goes to test after xray
-				} else {
-					printTime();
+							+ " needs test and didn't need xRay ");
+					patient.addToQ("qTest ");
+					// patient.increaseTestCounterTest();
 					patient.setNextProc(2);
-<<<<<<< HEAD
 					patient.setTotalNumTest(patient.getTotalNumTest() + 1);
 					System.out.println(doctor.getId()
 							+ " adds to list of patients in test "
@@ -1946,37 +1829,7 @@ public class Doctor extends General {
 				+ " is moving to doctors area at end first assessment");
 		doctor.moveToDoctorsArea();
 		doctor.decideWhatToDoNext();
-=======
-					System.out.println(patient.getId()
-							+ " will go back to bed after Xray");
-					// patient goes back to bed after xray
-				}
-			}
 
-			else if (route[0] == 0 && route[1] == 1) {
-				printTime();
-
-				System.out.println(patient.getId()
-						+ " needs test and didn't need xRay ");
-				patient.addToQ("qTest ");
-				// patient.increaseTestCounterTest();
-				patient.setNextProc(2);
-				patient.setTotalNumTest(patient.getTotalNumTest() + 1);
-				System.out.println(doctor.getId()
-						+ " adds to list of patients in test "
-						+ patient.getId());
->>>>>>> Refactor endFstAssessment method
-
-				doctor.myPatientsInTestAdd(patient);
-				System.out.println(" method end First assessment"
-						+ doctor.getId()
-						+ " has added to his patients in test "
-						+ patient.getId());
-				printElementsArray(doctor.getMyPatientsInTests(),
-						" my patients in test ");
-
-			}
-		}
 	}
 
 	public void movePatientBedReassessment(Doctor doctor) {
