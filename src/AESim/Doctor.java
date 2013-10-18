@@ -1,6 +1,5 @@
 package AESim;
 
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -30,10 +29,10 @@ public class Doctor extends General {
 
 	private ArrayList<Patient> myPatientsInTests;
 	private ArrayList<Patient> allMyPatients;
-	private ArrayList <Patient> patientsInMultiTask;
-	private int requiredAtWork ;
+	private ArrayList<Patient> patientsInMultiTask;
+	private int requiredAtWork;
 
- private static ArrayList<GridPoint> locFstAssessmentArray= new ArrayList<>();
+	private static ArrayList<GridPoint> locFstAssessmentArray = new ArrayList<>();
 	private Boolean available;
 	private Grid<Object> grid;
 	private boolean isInShift;
@@ -48,7 +47,6 @@ public class Doctor extends General {
 
 	private int multiTaskingFactor;
 	private Doctor doctorToHandOver;
-	
 
 	private double[] durationOfShift = new double[7];
 	private double k;
@@ -153,25 +151,25 @@ public class Doctor extends General {
 		this.myPatientsInTests = new ArrayList<Patient>();
 		this.myPatientsBackInBed = new LinkedList<Patient>();
 		this.canHelpAnotherDoctor = false;
-		this.doctorToHandOver=null;
-		this.multiTaskingFactor=multiTasking;
-//		this.numAvailable=multiTasking;
-		this.patientsInMultiTask= new ArrayList<>();
-		this.isAtDoctorArea=false;
-//		this.requiredAtWork= (int) this.getMyShiftMatrix()[0][0];
+		this.doctorToHandOver = null;
+		this.multiTaskingFactor = multiTasking;
+		// this.numAvailable=multiTasking;
+		this.patientsInMultiTask = new ArrayList<>();
+		this.isAtDoctorArea = false;
+		// this.requiredAtWork= (int) this.getMyShiftMatrix()[0][0];
 
 	}
-	
-	@ScheduledMethod(start=0, priority= 1)
-	public void assignLocQueueArray(){
+
+	@ScheduledMethod(start = 0, priority = 1)
+	public void assignLocQueueArray() {
 		int locX;
-		int locY =8;
+		int locY = 8;
 		GridPoint locQueueFstAssessment;
 		for (int i = 1; i <= 5; i++) {
-			locX= i;
+			locX = i;
 			locQueueFstAssessment = new GridPoint(locX, locY);
 			locFstAssessmentArray.add(locQueueFstAssessment);
-			
+
 		}
 	}
 
@@ -196,17 +194,19 @@ public class Doctor extends General {
 	public void myPatientsInTestRemove(Patient patient) {
 		System.out.println("\n" + this.getId()
 				+ " will remove to patients in test " + patient.getId());
-		
+
 		if (this.myPatientsInTests.remove(patient)) {
-			System.out.println(this.getId()+ " has removed from PinTest " + patient.getId() + " new array of patients in test:");
+			System.out.println(this.getId() + " has removed from PinTest "
+					+ patient.getId() + " new array of patients in test:");
 			printTime();
 			printElementsArray(this.myPatientsInTests, "in tests");
 			System.out.println("\n ");
-		} 
-		else {
-			System.err.println("\n ERROR: (I don't know what method is calling myPatientsInTestRemove )" + this.getId()
-					+ " it was not possible to remove from my patients test: "
-					+ patient.getId());
+		} else {
+			System.err
+					.println("\n ERROR: (I don't know what method is calling myPatientsInTestRemove )"
+							+ this.getId()
+							+ " it was not possible to remove from my patients test: "
+							+ patient.getId());
 		}
 	}
 
@@ -268,8 +268,6 @@ public class Doctor extends General {
 		return this.allMyPatients;
 	}
 
-
-	
 	@ScheduledMethod(start = 5, interval = 10, priority = 60, shuffle = false, pick = 1)
 	public void calcPECSvariables() {
 
@@ -315,7 +313,7 @@ public class Doctor extends General {
 
 		if (this.isInShift) {
 			printTime();
-			//this.setX1MyNumPatientsSeen(this.getAllMyPatients().size());
+			// this.setX1MyNumPatientsSeen(this.getAllMyPatients().size());
 			this.setX2MyTimeWorkedInShift(this.calculateWorkedTimeHours());// this
 																			// time
 																			// is
@@ -482,7 +480,7 @@ public class Doctor extends General {
 	}
 
 	public void initializeDoctorShiftParams() {
-		this.numAvailable= this.multiTaskingFactor;
+		this.numAvailable = this.multiTaskingFactor;
 		System.out.println(this.getId()
 				+ " is initializing PECS at the beginning of his shift: ");
 		printTime();
@@ -520,7 +518,7 @@ public class Doctor extends General {
 		this.setcZ3W3(0.7);
 		this.setAlphaZ5W4(5);
 		this.setcZ5W4(0.5);
-		
+
 	}
 
 	public int getMaxTriage() {
@@ -875,8 +873,7 @@ public class Doctor extends General {
 			this.doctorToTakeOver();
 
 		}
-		
-		
+
 		this.setZ1Energy(1);
 		this.setZ2Calmness(1);
 		this.setZ3Knowledge(0);
@@ -884,8 +881,7 @@ public class Doctor extends General {
 		this.setZ5Reputation(this.getZ5Reputation());
 		this.z3KnowledgeMatrixPatient = new double[0];
 		this.w3WillOfKnowledgeMatrix = new double[0];
-		
-		
+
 		this.setInShift(false);
 		this.setAvailable(false);
 		this.initMemory();
@@ -899,7 +895,7 @@ public class Doctor extends General {
 		int y = i + 4;
 
 		grid.moveTo(this, x, y);
-		this.isAtDoctorArea=false;
+		this.isAtDoctorArea = false;
 		System.out.println(this.getId()
 				+ "  has finished his shift and has moved out to "
 				+ this.getLoc(grid).toString());
@@ -910,51 +906,54 @@ public class Doctor extends General {
 	}
 
 	public void moveToDoctorsArea() {
+		if (this.patientsInMultiTask.size() < this.multiTaskingFactor) {
 
-		if (this.getIdNum() != 0) {
-			boolean flag = false;
-			int y = 4;
-			int x;
-			for (int j = 0; j < 2; j++) {
-				// System.out.println(" j: " + j);
-				for (int i = 1; i < 6; i++) {
-					// System.out.println(" i " + i);
-					Object o = grid.getObjectAt(i + 6, y + j);
-					if (o == null) {
-						x = i + 6;
-						grid.moveTo(this, x, y + j);
-						this.isAtDoctorArea=true;
-						System.out.println(this.getId()
-								+ " has moved to doctors area "
-								+ this.getLoc(grid).toString() + " at time "
-								+ getTime());
-						flag = true;
-						break;
+			if (this.getIdNum() != 0) {
+				boolean flag = false;
+				int y = 4;
+				int x;
+				for (int j = 0; j < 2; j++) {
+					// System.out.println(" j: " + j);
+					for (int i = 1; i < 6; i++) {
+						// System.out.println(" i " + i);
+						Object o = grid.getObjectAt(i + 6, y + j);
+						if (o == null) {
+							x = i + 6;
+							grid.moveTo(this, x, y + j);
+							this.isAtDoctorArea = true;
+							System.out.println(this.getId()
+									+ " has moved to doctors area "
+									+ this.getLoc(grid).toString()
+									+ " at time " + getTime());
+							flag = true;
+							break;
+
+						}
+						if (flag) {
+							break;
+						}
 
 					}
 					if (flag) {
 						break;
 					}
+				}
 
-				}
-				if (flag) {
-					break;
-				}
+			} else if (this.getIdNum() == 0) {
+
+				grid.moveTo(this, this.getInitPosX(), this.initPosY);
+
+				System.out.println(this.getId()
+						+ " has moved to consultant area "
+						+ this.getLoc(grid).toString());
 			}
 
-		} else if (this.getIdNum() == 0) {
-
-			grid.moveTo(this, this.getInitPosX(), this.initPosY);
-
-			System.out.println(this.getId() + " has moved to consultant area "
-					+ this.getLoc(grid).toString());
+			this.setInShift(true);
+			this.setAvailable(true);
+			System.out.println(this.getId()
+					+ " is in shift and is available at " + getTime());
+			// this.decideWhatToDoNext();
 		}
-
-		this.setInShift(true);
-		this.setAvailable(true);
-		System.out.println(this.getId() + " is in shift and is available at "
-				+ getTime());
-//		this.decideWhatToDoNext();
 	}
 
 	// @ScheduledMethod(start=15, interval= 15, priority= 20)
@@ -975,69 +974,73 @@ public class Doctor extends General {
 	}
 
 	public void decideWhatToDoNext() {
-		printTime();
-		System.out.println(this.getId() + " decides what to do next");
-		this.requiredAtWork = (int) this.getMyShiftMatrix()[getHour()][getDay()];
-		if (requiredAtWork == 0) {
-			this.moveOut();
-		} else {
-			if (this.available) {
-				boolean isStartReassessment = this.checkIfStartReassessment();
-				if (isStartReassessment==false) {
-					if (this.doctorType== "SHO " ){
-						System.out.println(" checks if there is any sho available to start init assessment " );
-						boolean isStartInitAssessment = this
-								.checkIfStartInitAssessment();
-						if (isStartInitAssessment==false) {
-							if (this.isAtDoctorArea==false){
-								System.out.println(this.getId()+ " is moving to docs area because when decide what to do has nothing to do ");
-								this.moveToDoctorsArea();
-							}
-						}
-					} else {
-						if (this.doctorType == "Consultant ") {
+		if (this.patientsInMultiTask.size() < this.multiTaskingFactor) {
+			printTime();
+			System.out.println(this.getId() + " decides what to do next");
+			this.requiredAtWork = (int) this.getMyShiftMatrix()[getHour()][getDay()];
+			if (requiredAtWork == 0) {
+				this.moveOut();
+			} else {
+				if (this.available) {
+					boolean isStartReassessment = this
+							.checkIfStartReassessment();
+					if (isStartReassessment == false) {
+						if (this.doctorType == "SHO ") {
 							System.out
-									.println(this.getId()
-											+ " is consultant and is checking any other sho is available");
-							Doctor shoAvailable = checkForAnyAvailableDoctor();
-							if (shoAvailable == null) {
-
+									.println(" checks if there is any sho available to start init assessment ");
+							boolean isStartInitAssessment = this
+									.checkIfStartInitAssessment();
+							if (isStartInitAssessment == false) {
+								if (this.isAtDoctorArea == false) {
+									System.out
+											.println(this.getId()
+													+ " is moving to docs area because when decide what to do has nothing to do ");
+									this.moveToDoctorsArea();
+								}
+							}
+						} else {
+							if (this.doctorType == "Consultant ") {
 								System.out
 										.println(this.getId()
-												+ " is SHO and is checking if start init assessment");
-								boolean isStartInitAssessment = this
-										.checkIfStartInitAssessment();
-								if (isStartInitAssessment == false) {
-									if (this.isAtDoctorArea == false) {
-										this.moveToDoctorsArea();
+												+ " is consultant and is checking any other sho is available");
+								Doctor shoAvailable = checkForAnyAvailableDoctor();
+								if (shoAvailable == null) {
+
+									System.out
+											.println(this.getId()
+													+ " is SHO and is checking if start init assessment");
+									boolean isStartInitAssessment = this
+											.checkIfStartInitAssessment();
+									if (isStartInitAssessment == false) {
+										if (this.isAtDoctorArea == false) {
+											this.moveToDoctorsArea();
+										}
 									}
+
 								}
 
 							}
 
 						}
-
 					}
 				}
 			}
 		}
 
-
-
 	}
 
-	
 	private Doctor checkForAnyAvailableDoctor() {
-		Doctor shoAvailable=null;
-		System.out.println(" checks if there is any sho available to start init assessment " );
+		Doctor shoAvailable = null;
+		System.out
+				.println(" checks if there is any sho available to start init assessment ");
 		for (Object sho : getContext().getObjects(Doctor.class)) {
-			Doctor shoToCheck= (Doctor) sho;
-			if (shoToCheck.getAvailable()){
-				shoAvailable= shoToCheck;
+			Doctor shoToCheck = (Doctor) sho;
+			if (shoToCheck.getAvailable()) {
+				shoAvailable = shoToCheck;
 				System.out.println(shoAvailable.getId() + " is available ");
 				break;
 			}
-		}		
+		}
 		return shoAvailable;
 	}
 
@@ -1045,7 +1048,7 @@ public class Doctor extends General {
 		/*
 		 * Prueba de branches
 		 */
-		boolean isStartInitAssessment= false;
+		boolean isStartInitAssessment = false;
 		/*
 		 * Prueba 3
 		 */
@@ -1054,59 +1057,67 @@ public class Doctor extends General {
 		// The head of the queue is at (x,y-1)
 		// Object o = grid.getObjectAt(locX, locY);
 		int i = 1;
-		while(i<=5 && !flag) {
+		while (i <= 5 && !flag) {
 			// checking from left to right, which patient is at the head of
 			// assessment (by each triage color) queue
 
 			for (Object o : grid.getObjectsAt(i, 8)) {
 				if (o instanceof Patient) {
 					fstpatient = (Patient) o;
-					flag=true;
+					flag = true;
 					break;
 				}
-		
+
 			}
-			i ++;
+			i++;
 			// checks if there is anyone to start the first assessment
 		}
 
 		if (fstpatient != null) {
-			System.out.println(this. getId() +" decide to start init assessment with:" + fstpatient.getId());
+			System.out.println(this.getId()
+					+ " decide to start init assessment with:"
+					+ fstpatient.getId());
 			isBusy = true;
 			this.startInitAssessment(fstpatient);
-			isStartInitAssessment=true;
+			isStartInitAssessment = true;
 
 		} else {
 			isBusy = false;
-			System.out.println(this.getId()
-					+ " has nothing to do?, patients:"
+			System.out.println(this.getId() + " has nothing to do?, patients:"
 					+ this.getAllMyPatients());
-			System.out.println(this.getId() + " is available and...decides what to do, moving to docs area when start shift");
-			if (!this.isAtDoctorArea)this.moveToDoctorsArea();
+			System.out
+					.println(this.getId()
+							+ " is available and...decides what to do, moving to docs area when start shift");
+			if (!this.isAtDoctorArea)
+				this.moveToDoctorsArea();
 		}
 		return isStartInitAssessment;
 
-	
 	}
-		
-	
 
 	private boolean checkIfStartReassessment() {
-		boolean isStartReassessment= false;
-		int doctorPatientsNum = this.getMyPatientsBackInBed().size();
-		if (doctorPatientsNum > 0) {
-			//			TODO esto estaba con poll, yo lo voy a cambiar a peek Patient watchedAgent = this.getMyPatientsBackInBed().poll();
-						Patient watchedAgent = this.getMyPatientsBackInBed().peek();
-						System.out.println("\n start reassessment by 'decide what to do': " + watchedAgent.getId() +" and "+this.getId());
-						isBusy = true;
-						this.startReassessment(watchedAgent);
-						isStartReassessment= true;
-					
-					} 
-	return isStartReassessment;	
+
+		boolean isStartReassessment = false;
+		if (this.patientsInMultiTask.size() < this.multiTaskingFactor) {
+			int doctorPatientsNum = this.getMyPatientsBackInBed().size();
+			if (doctorPatientsNum > 0) {
+				// TODO esto estaba con poll, yo lo voy a cambiar a peek Patient
+				// watchedAgent = this.getMyPatientsBackInBed().poll();
+				Patient watchedAgent = this.getMyPatientsBackInBed().peek();
+				System.out
+						.println("\n start reassessment by 'decide what to do': "
+								+ watchedAgent.getId() + " and " + this.getId());
+				isBusy = true;
+				this.startReassessment(watchedAgent);
+				isStartReassessment = true;
+
+			}
+		}
+
+		return isStartReassessment;
 	}
 
-	public void decisionPECS(){
+	public void decisionPECS() {
 		// see if he has patients waiting in bed and start reassessment
 		int decision = this.calcMaxWPECS();// need to recorrer todos los
 		// wknoledge y si hay uno que gane,
@@ -1117,12 +1128,12 @@ public class Doctor extends General {
 			// schedule end of Not Availability
 			break;
 		case 2:// Stress
-			// choose a patient and affect the time of first assessment and
-			// probability of test
+				// choose a patient and affect the time of first assessment and
+				// probability of test
 
 			break;
 		case 3:// WillOfWknowledge
-			// increases number of tests
+				// increases number of tests
 
 			break;
 		case 4: // socialDesire
@@ -1133,6 +1144,7 @@ public class Doctor extends General {
 		}
 
 	}
+
 	public Doctor doctorToTakeOver() {
 		Doctor doctor = null;
 		Context<Object> context = getContext();
@@ -1163,21 +1175,20 @@ public class Doctor extends General {
 						doctor.decideWhatToDoNext();
 						break;
 					}
-					
-				}
-				else doctor=null;
+
+				} else
+					doctor = null;
 			}
-			
-		
+
 		}
-		
-		
+
 		if (doctor == null) {
-			
+
 			System.err.println("there is no doctor to take over: "
 					+ this.getId() + " is leaving");
-			
-			System.out.println(this.getId() + " search for somebody to stay at least when he leaves");
+
+			System.out.println(this.getId()
+					+ " search for somebody to stay at least when he leaves");
 			for (Object d : context.getObjects(Doctor.class)) {
 				if (d != null) {
 					doctor = (Doctor) d;
@@ -1197,29 +1208,26 @@ public class Doctor extends General {
 						if ((doctor.getMyShiftMatrix()[hour][day] == 1)) {
 							enterIf = true;
 							printTime();
-							System.out.println("there is a doctor to take over: "
-									+ doctor.getId());
+							System.out
+									.println("there is a doctor to take over: "
+											+ doctor.getId());
 							this.handOver(doctor);
 							doctor.decideWhatToDoNext();
 							break;
 						}
 					}
 				}
-				
-			
+
 			}
-			
-			
-			
-			
-			
+
 		}
-		
-			if (this.getId().equals("doctor 9")){
-				System.out.println(this.getId() + " d9 handles to " + doctor.getId());
-				
-			}
-		
+
+		if (this.getId().equals("doctor 9")) {
+			System.out.println(this.getId() + " d9 handles to "
+					+ doctor.getId());
+
+		}
+
 		return doctor;
 	}
 
@@ -1233,8 +1241,7 @@ public class Doctor extends General {
 				.getMyPatientsInBedTriage();
 		ArrayList<Patient> newMyPatientsInTests = this.getMyPatientsInTests();
 		LinkedList<Patient> myNewPatientsBackInBed = this.myPatientsBackInBed;
-		
-		
+
 		System.out.println(doctor.getId()
 				+ " before take over the patients had in all his list: \n");
 		doctor.printElementsQueue(doctor.myPatientsInBedTime,
@@ -1242,13 +1249,13 @@ public class Doctor extends General {
 		doctor.printElementsArray(doctor.myPatientsInTests,
 				" patients in test \n");
 		if (this.myPatientsInBedTime.size() > 0)
-		doctor.myPatientsInBedTime.addAll(newMyPatientsInBedTime);
+			doctor.myPatientsInBedTime.addAll(newMyPatientsInBedTime);
 		if (this.myPatientsInBedTriage.size() > 0)
-		doctor.myPatientsInBedTriage.addAll(newMyPatientsInBedTriage);
+			doctor.myPatientsInBedTriage.addAll(newMyPatientsInBedTriage);
 		if (this.myPatientsInTests.size() > 0)
-		doctor.myPatientsInTests.addAll(newMyPatientsInTests);
+			doctor.myPatientsInTests.addAll(newMyPatientsInTests);
 		if (this.myPatientsBackInBed.size() > 0)
-		doctor.myPatientsBackInBed.addAll(myNewPatientsBackInBed);
+			doctor.myPatientsBackInBed.addAll(myNewPatientsBackInBed);
 
 		for (int i = 0; i < this.getAllMyPatients().size(); i++) {
 			Patient patient = this.getAllMyPatients().get(i);
@@ -1257,17 +1264,17 @@ public class Doctor extends General {
 			System.out.println("/n " + patient.getId() + " has a new doctor: "
 					+ patient.getMyDoctor().getId());
 		}
-		
+
 		double x = doctor.getX1MyNumPatientsSeen();
 		x = x + (double) this.getAllMyPatients().size();
 		doctor.setX1MyNumPatientsSeen(x);
-		
+
 		this.myPatientsInBedTime.clear();
 		this.myPatientsInBedTriage.clear();
 		this.myPatientsInTests.clear();
 		this.allMyPatients.clear();
 		this.setX1MyNumPatientsSeen(0);
-		this.doctorToHandOver= doctor;
+		this.doctorToHandOver = doctor;
 		System.out.println(doctor.getId()
 				+ " receiving after take over at time:  " + getTime());
 		System.out.println(doctor.getId() + " has received in his list: \n");
@@ -1284,26 +1291,22 @@ public class Doctor extends General {
 		doctor.printElementsArray(this.myPatientsInTests,
 				" patients in test \n");
 
-		
-		/*for (int i = 0; i < this.getMyPatientsInTests().size(); i++) {
-			Patient patient = this.getMyPatientsInTests().get(i);
-			patient.setMyDoctor(doctor);
-			printTime();
-			System.out.println("/n " + patient.getId() + "  is in tests and has a new doctor: "
-					+ patient.getMyDoctor().getId());
-		}
-		
-	for (Iterator<Patient> iterator = this.myPatientsInBedTime.iterator(); iterator
-			.hasNext();) {
-		Patient patient = (Patient) iterator.next();
-		patient.setMyDoctor(doctor);
-		printTime();
-		System.out.println("/n " + patient.getId() + "  is in bed and has a new doctor: "
-				+ patient.getMyDoctor().getId());
-		
-	}*/
-		
-		
+		/*
+		 * for (int i = 0; i < this.getMyPatientsInTests().size(); i++) {
+		 * Patient patient = this.getMyPatientsInTests().get(i);
+		 * patient.setMyDoctor(doctor); printTime(); System.out.println("/n " +
+		 * patient.getId() + "  is in tests and has a new doctor: " +
+		 * patient.getMyDoctor().getId()); }
+		 * 
+		 * for (Iterator<Patient> iterator =
+		 * this.myPatientsInBedTime.iterator(); iterator .hasNext();) { Patient
+		 * patient = (Patient) iterator.next(); patient.setMyDoctor(doctor);
+		 * printTime(); System.out.println("/n " + patient.getId() +
+		 * "  is in bed and has a new doctor: " +
+		 * patient.getMyDoctor().getId());
+		 * 
+		 * }
+		 */
 
 		System.out.println(this.getId() + " handled to " + doctor.getId()
 				+ " time " + getTime());
@@ -1313,45 +1316,50 @@ public class Doctor extends General {
 	public void scheduleWork() {
 		int hour = getHour();
 		int day = getDay();
-		System.out.println("\n \n " +this.getId() + " is doing method : SCHEDULE WORK ");
+		System.out.println("\n \n " + this.getId()
+				+ " is doing method : SCHEDULE WORK ");
 		this.requiredAtWork = (int) this.getMyShiftMatrix()[hour][day];
-//		if (this.doctorType=="Consultant "){ requiredAtWork =1}; 
+		// if (this.doctorType=="Consultant "){ requiredAtWork =1};
 		// doctor is not in shift
 		if (requiredAtWork == 0) {
-			System.out.println(this.getId() + " is not required at work at time " + getTime());
+			System.out.println(this.getId()
+					+ " is not required at work at time " + getTime());
 			printTime();
 			if (this.getAvailable()) {
-				System.out
-						.println(this.getId()
-								+ " WAS AVAILABLE WHEN FINISHED SHIFT ");
-				
-				if(this.getAllMyPatients().size()>0){
-					System.out.println(this.getId() + " STILL HAS PATIENTS TO SEE, CHECKING IF THERE ARE DOCTOR TO TAKE OVER");
+				System.out.println(this.getId()
+						+ " WAS AVAILABLE WHEN FINISHED SHIFT ");
+
+				if (this.getAllMyPatients().size() > 0) {
+					System.out
+							.println(this.getId()
+									+ " STILL HAS PATIENTS TO SEE, CHECKING IF THERE ARE DOCTOR TO TAKE OVER");
 					if (this.doctorToTakeOver() != null) {
-						System.out.println(this.getId() + " has found a doctor to hand over his patients ");
+						System.out
+								.println(this.getId()
+										+ " has found a doctor to hand over his patients ");
 						System.out.println(this.getId() + " IS MOVING OUT ");
 						this.moveOut();
-					}					
-									
+					}
+
 				}
-				
+
 				else {
-					System.out.println(this.getId() + " has no patients left to see ");
+					System.out.println(this.getId()
+							+ " has no patients left to see ");
 					System.out.println(this.getId() + " IS MOVING OUT ");
 					this.moveOut();
 				}
-				
+
 			} else {
-				System.out
-				.println(this.getId()
+				System.out.println(this.getId()
 						+ " WAS NOT AVAILABLE WHEN FINISHED SHIFT ");
 				// if this is not available
-				double maxEndingTime= 0; 
+				double maxEndingTime = 0;
 				for (Iterator iterator = this.patientsInMultiTask.iterator(); iterator
 						.hasNext();) {
 					Patient patient = (Patient) iterator.next();
-					if(patient.getTimeEndCurrentService()>maxEndingTime){
-						maxEndingTime= patient.getTimeEndCurrentService();
+					if (patient.getTimeEndCurrentService() > maxEndingTime) {
+						maxEndingTime = patient.getTimeEndCurrentService();
 					}
 				}
 				if (getTime() < maxEndingTime) {
@@ -1360,26 +1368,28 @@ public class Doctor extends General {
 							.println(this.getId()
 									+ " has finished his shift but needs to wait to leave because he still has work to do");
 					double timeEnding = maxEndingTime;
-					this.scheduleEndShift(timeEnding+5);
+					this.scheduleEndShift(timeEnding + 5);
 				}
 			}
 		}
-		
+
 		else if (requiredAtWork == 1) {
 			// TODO here if (this.isInShift() == false) didn't have {}, i put
 			// them but needs to be checked
 			if (this.isInShift() == false) {
 				this.setTimeInitShift(getTime());
 				this.initializeDoctorShiftParams();
-				this.doctorToHandOver= null;
+				this.doctorToHandOver = null;
 				System.out.println(this.getId() + " will move to doctors area"
 						+ " method: schedule work"
 						+ " this method is being called by " + this.getId());
 				this.startShift = true;
-				this.numAvailable=this.multiTaskingFactor;
+				this.numAvailable = this.multiTaskingFactor;
 				this.setAvailable(true);
-				if(this.isAtDoctorArea==false)
-					this.moveToDoctorsArea();
+				if (this.isAtDoctorArea == false)
+					System.out.println(this.getId()
+							+ " is moving to docs area when schedule work");
+				this.moveToDoctorsArea();
 				this.decideWhatToDoNext();
 			} else {
 				this.startShift = false;
@@ -1389,7 +1399,8 @@ public class Doctor extends General {
 	}
 
 	public void scheduleEndShift(double timeEnding) {
-		System.out.println(" current time: " + getTime()  + " " +this.getId() + " is supposed to move out at: " + timeEnding);
+		System.out.println(" current time: " + getTime() + " " + this.getId()
+				+ " is supposed to move out at: " + timeEnding);
 		ISchedule schedule = repast.simphony.engine.environment.RunEnvironment
 				.getInstance().getCurrentSchedule();
 		ScheduleParameters scheduleParams = ScheduleParameters
@@ -1417,47 +1428,51 @@ public class Doctor extends General {
 	public void endShift() {
 		printTime();
 		System.out.println(this.getId()
-				+ " has finished the shift and will move out at " +getTime());
+				+ " has finished the shift and will move out at " + getTime());
 
 		this.moveOut();
 
 	}
 
-	@Watch(watcheeClassName = "AESim.Doctor", watcheeFieldNames = "isAtDoctorArea", scheduleTriggerPriority=90, whenToTrigger = WatcherTriggerSchedule.IMMEDIATE /*, pick=1*/)
-	public void callDoctorsToWork(){
-		if (this.available) this.checkIfStartInitAssessment();
+	@Watch(watcheeClassName = "AESim.Doctor", watcheeFieldNames = "isAtDoctorArea", scheduleTriggerPriority = 90, whenToTrigger = WatcherTriggerSchedule.IMMEDIATE /*
+																																									 * ,
+																																									 * pick
+																																									 * =
+																																									 * 1
+																																									 */)
+	public void callDoctorsToWork() {
+		if (this.available)
+			this.checkIfStartInitAssessment();
 	}
-	
-	
-	@Watch(watcheeClassName = "AESim.Patient", watcheeFieldNames = "wasFirstforAsses", triggerCondition = "$watchee.getNumWasFstForAssess()>0", scheduleTriggerPriority=90, whenToTrigger = WatcherTriggerSchedule.IMMEDIATE /*, pick=1*/)
+
+	@Watch(watcheeClassName = "AESim.Patient", watcheeFieldNames = "wasFirstforAsses", triggerCondition = "$watchee.getNumWasFstForAssess()>0", scheduleTriggerPriority = 90, whenToTrigger = WatcherTriggerSchedule.IMMEDIATE /*
+																																																								 * ,
+																																																								 * pick
+																																																								 * =
+																																																								 * 1
+																																																								 */)
 	public void newPatientForInitAssessment(Patient watchedPatient) {
 		System.out.println("\n " + this.getId() + " watcher init, time: "
 				+ getTime());
-		int triage= watchedPatient.getTriageNum();
+		int triage = watchedPatient.getTriageNum();
 		watchedPatient.setNumWasFstForAssess(0);
-		if (this.available && findBed(triage)!=null) {
-		
-			
+		if (this.available && findBed(triage) != null) {
+
 			// this.decideWhatToDoNext();
-		
+
 			this.startInitAssessment(watchedPatient);
 		}
 	}
-	
-	
 
-	
-	
-	public void callFromHeadOfQueue(Patient watchedPatientFA){
-		
+	public void callFromHeadOfQueue(Patient watchedPatientFA) {
+
 	}
-	
-	
 
 	public boolean startInitAssessment(Patient watchedPatientFA) {
 		boolean startInitAssessment = false;
 		printTime();
-		System.out.println(this.getId() + " start init assessment by decide what to do next ? with:  "
+		System.out.println(this.getId()
+				+ " start init assessment by decide what to do next ? with:  "
 				+ watchedPatientFA.getId());
 		double time = getTime();
 
@@ -1466,37 +1481,33 @@ public class Doctor extends General {
 					.println(this.getId()
 							+ " can´t start init assessment because doctor status available is? "
 							+ this.getAvailable());
+		} else {
+			startInitAssessment = this.doFirstAssessment(watchedPatientFA);
 		}
-		else {
-			startInitAssessment=this.doFirstAssessment(watchedPatientFA);
-		}
-
 
 		return startInitAssessment;
 
 	}
 
-	
-	private boolean doFirstAssessment(Patient fstpatient){
-		boolean startInitAssessment= false;
+	private boolean doFirstAssessment(Patient fstpatient) {
+		boolean startInitAssessment = false;
 		printTime();
 		System.out.println("      \n \n START FIRST ASSESSMENT  "
 				+ this.getId() + " & " + fstpatient.getId() + " \n");
 		double time = getTime();
-		
+
 		int triage = fstpatient.getTriageNum();
 		// find the bed according to the patient's needs.
 		Resource rAvailable = findBed(triage);
-		if (rAvailable==null){
+		if (rAvailable == null) {
 			System.out.println(" there is no bed available");
-		}
-		else {
-		// if there is a bed and it free, then
+		} else {
+			// if there is a bed and it free, then
 			if (rAvailable.getAvailable()) {
 				GridPoint loc = rAvailable.getLoc(grid);
 				int locX = loc.getX();
 				int locY = loc.getY();
-	
+
 				Patient patientAlreadyInBed = null;
 				Doctor doctorAlreadyInBed = null;
 				System.out.println(this.getId()
@@ -1505,30 +1516,30 @@ public class Doctor extends General {
 				for (Object agentObject : grid.getObjectsAt(locX, locY)) {
 					if (agentObject instanceof Patient) {
 						patientAlreadyInBed = (Patient) agentObject;
-						System.err.println("ERROR:  there is already a patient in that bed: "
+						System.err
+								.println("ERROR:  there is already a patient in that bed: "
 										+ patientAlreadyInBed.getId());
-					} 
-					
+					}
+
 					else if (agentObject instanceof Doctor) {
 						doctorAlreadyInBed = (Doctor) agentObject;
-						System.err.println("ERROR: there is already a doctor in that bed: "
+						System.err
+								.println("ERROR: there is already a doctor in that bed: "
 										+ doctorAlreadyInBed.getId());
-	
+
 					}
-	
+
 				}
-				if (doctorAlreadyInBed != null
-						&& patientAlreadyInBed == null) {
+				if (doctorAlreadyInBed != null && patientAlreadyInBed == null) {
 					System.err.println("\n ERROR: "
 							+ doctorAlreadyInBed.getId() + " is at "
 							+ rAvailable.getId()
 							+ " and there is not patient in bed");
 				}
-				
-				//ACTUALLY STARTS FIRST ASSESSMENT
-				if (doctorAlreadyInBed == null
-						&& patientAlreadyInBed == null) {
-//					fstpatient.setNumWasFstForAssess(0);
+
+				// ACTUALLY STARTS FIRST ASSESSMENT
+				if (doctorAlreadyInBed == null && patientAlreadyInBed == null) {
+					// fstpatient.setNumWasFstForAssess(0);
 					printTime();
 					System.out.println(rAvailable.getId() + " is empty ");
 					grid.moveTo(this, locX, locY);
@@ -1537,61 +1548,67 @@ public class Doctor extends General {
 							+ fstpatient.getId() + " have moved to "
 							+ this.getLoc(grid).toString() + " to "
 							+ rAvailable.getId());
-					
+
 					this.setMyResource(rAvailable);
 					fstpatient.setMyResource(rAvailable);
-					
+
 					Queue queue = fstpatient.getCurrentQueue();
 					Patient patientToRemove = queue.removeFromQueue(time);
-	
+
 					queue.elementsInQueue();
-	
-					//add patient to bed:
-					System.out.println("method: start init assessment " +this.getId() + " will add to his patients in bed " + fstpatient.getId() );
+
+					// add patient to bed:
+					System.out.println("method: start init assessment "
+							+ this.getId()
+							+ " will add to his patients in bed "
+							+ fstpatient.getId());
 					this.myPatientsInBedAdd(fstpatient);
 					this.patientsInMultiTask.add(fstpatient);
 					double x = this.getX1MyNumPatientsSeen();
 					x++;
-					this.setX1MyNumPatientsSeen(x);					
-					
-					printElementsQueue(this.myPatientsInBedTime, " my patients in bed time" );
-					
+					this.setX1MyNumPatientsSeen(x);
+
+					printElementsQueue(this.myPatientsInBedTime,
+							" my patients in bed time");
+
 					this.setMultitask(true);
-					printElementsArray(this.patientsInMultiTask, " patients in multitasking");
-					//this.setAvailable(false);				
-					System.out.println(this.getId() + " is setting " + rAvailable.getId() + " available= false");
+					printElementsArray(this.patientsInMultiTask,
+							" patients in multitasking");
+					// this.setAvailable(false);
+					System.out.println(this.getId() + " is setting "
+							+ rAvailable.getId() + " available= false");
 					rAvailable.setAvailable(false);
-					if (this.available) this.decideWhatToDoNext();			
+					if (this.available)
+						this.decideWhatToDoNext();
 					startInitAssessment = true;
 					this.scheduleEnd1stAssessment(fstpatient);
-					
+
 					printTime();
-					
+
 					System.out
 							.println(this.getId()
 									+ " schedules the end of first assessment and checks if there are more patients waiting at "
 									+ queue.getId());
-	
+
 					if (queue.getSize() > 0) {
 						System.out
 								.println("there are patients waiting for first assessment at:"
 										+ queue.getId());
-						
+
 						Patient patientToMove = queue.firstInQueue();
-						
+
 						System.out.println(patientToMove.getId()
-								+ " will move to the head of "
-								+ queue.getId() + " at:" + getTime());
+								+ " will move to the head of " + queue.getId()
+								+ " at:" + getTime());
 						patientToMove.moveToHeadOfQ(queue);
-					} 
-	
+					}
+
 				}
 			}
 		}
 		return startInitAssessment;
 	}
-	
-	
+
 	private static class EndFstAssessment implements IAction {
 		private Doctor doctor;
 		private Patient patient;
@@ -1605,7 +1622,6 @@ public class Doctor extends General {
 		@Override
 		public void execute() {
 			doctor.endFstAssessment(this.patient);
-			
 
 		}
 
@@ -1633,7 +1649,7 @@ public class Doctor extends General {
 		System.out.println("\n \t\t END FIRST ASSESSMENT");
 		Doctor doctor = null;
 		printTime();
-		
+
 		if (patient == null) {
 			System.err
 					.println("\n ERROR: Shouldn't be happening, patient is null at end of fst assessment");
@@ -1651,56 +1667,66 @@ public class Doctor extends General {
 
 			else {
 				if (patient.getMyDoctor() != null)
-					if( patient.getMyDoctor().isInShift()) {
-						System.out.println(patient.getMyDoctor().getId()  + " is not in shift but is ending the fst assessment with " + patient.getId());
-					doctor = patient.getMyDoctor();
-				}
-				else {
-					doctor= patient.getMyDoctor();					
-				}
+					if (patient.getMyDoctor().isInShift()) {
+						System.out
+								.println(patient.getMyDoctor().getId()
+										+ " is not in shift but is ending the fst assessment with "
+										+ patient.getId());
+						doctor = patient.getMyDoctor();
+					} else {
+						doctor = patient.getMyDoctor();
+					}
 			}
 		}
 
 		if (doctor != null) {
-			
+
 			int totalProcess = patient.getTotalProcesses();
-			patient.setTotalProcesses(totalProcess+1);;
+			patient.setTotalProcesses(totalProcess + 1);
+			;
 			this.patientsInMultiTask.remove(patient);
 			doctor.setMultitask(false);
-			
-			//doctor decides what to do 
+
+			// doctor decides what to do
 			int route[] = decideTests(patient.getTriageNum());
 			boolean needTest = false;
 			// patient leaves the dept
 			if (route[0] == 0 && route[1] == 0) {
-				Resource resourceToRelease= patient.getMyResource();
+				Resource resourceToRelease = patient.getMyResource();
 				this.removePatientFromDepartment(patient);
-				System.out.println("method end fst assessment "+this.getId() + " is setting " + resourceToRelease.getId() + " available= true");
+				System.out.println("method end fst assessment " + this.getId()
+						+ " is setting " + resourceToRelease.getId()
+						+ " available= true");
 				resourceToRelease.setAvailable(true);
 			} else {
 				needTest = true;
-				if(Math.random()<0.1 && patient.getTriageNum() != 5){
-					Resource resourceToRelease= patient.getMyResource();
-					System.out.println("method end fst assessment "+this.getId() + " is setting " + resourceToRelease.getId() + " available= true, becasue "+ patient.getId() + " does not wait for test in bed" );
+				if (Math.random() < 0.1 && patient.getTriageNum() != 5) {
+					Resource resourceToRelease = patient.getMyResource();
+					System.out.println("method end fst assessment "
+							+ this.getId() + " is setting "
+							+ resourceToRelease.getId()
+							+ " available= true, becasue " + patient.getId()
+							+ " does not wait for test in bed");
 					resourceToRelease.setAvailable(true);
 					patient.setWaitInCublicle(false);
 					patient.setIsWaitingBedReassessment(1);
 				} else {
-					Resource resourceToGo = patient.getMyResource();					
+					Resource resourceToGo = patient.getMyResource();
 					patient.setMyBedReassessment(resourceToGo);
 					patient.getMyBedReassessment().setAvailable(false);
 					resourceToGo.setWhoBlockedMe(patient);
-					System.out.println(patient.getId() + " has blocked " + resourceToGo.getId());
+					System.out.println(patient.getId() + " has blocked "
+							+ resourceToGo.getId());
 					System.out.println(patient.getId() + " reserves "
 							+ patient.getMyBedReassessment().getId()
 							+ " as my bed reassessment ");
-				}			
+				}
 				patient.setMyDoctor(doctor);
 				printTime();
 				System.out.println(patient.getId()
 						+ " keeps in mind that his assigned doctor is  "
 						+ patient.getMyDoctor().getId());
-	
+
 				doctor.setMyResource(null);
 				doctor.setMultitask(false);
 				// this.setAvailable(true);
@@ -1709,9 +1735,9 @@ public class Doctor extends General {
 						+ " will remove from list of patients in bed "
 						+ patient.getId());
 				System.out.println(" method end fst assessment");
-	
+
 				doctor.myPatientsInBedRemove(patient);
-	
+
 				System.out.println(doctor.getId()
 						+ " will move to doctors area"
 						+ " method: endFstAssessment"
@@ -1722,7 +1748,7 @@ public class Doctor extends General {
 						.println(this.getId() + " decides for patient's test");
 				if (route[0] == 1) {
 					printTime();
-	
+
 					System.out.println(patient.getId() + " needs Xray ");
 					System.out.println(patient.getId() + " goes to qXray");
 					patient.addToQ("qXRay ");
@@ -1735,12 +1761,12 @@ public class Doctor extends General {
 							+ doctor.getId()
 							+ " will add to his patients in test "
 							+ patient.getId());
-	
+
 					doctor.myPatientsInTestAdd(patient);
-	
+
 					printElementsArray(doctor.getMyPatientsInTests(),
 							" my patients in test ");
-	
+
 					if (route[1] == 1) {
 						printTime();
 						patient.setNextProc(1);
@@ -1755,10 +1781,10 @@ public class Doctor extends General {
 						// patient goes back to bed after xray
 					}
 				}
-	
+
 				else if (route[0] == 0 && route[1] == 1) {
 					printTime();
-	
+
 					System.out.println(patient.getId()
 							+ " needs test and didn't need xRay ");
 					patient.addToQ("qTest ");
@@ -1768,7 +1794,7 @@ public class Doctor extends General {
 					System.out.println(doctor.getId()
 							+ " adds to list of patients in test "
 							+ patient.getId());
-	
+
 					doctor.myPatientsInTestAdd(patient);
 					System.out.println(" method end First assessment"
 							+ doctor.getId()
@@ -1776,67 +1802,74 @@ public class Doctor extends General {
 							+ patient.getId());
 					printElementsArray(doctor.getMyPatientsInTests(),
 							" my patients in test ");
-	
+
 				}
 			}
 		} else {
 			System.err
 					.println(" ERROR: something is wrong here, no doctor to end fst assessment with "
 							+ patient.getId());
-//			this.doEndFstAssessment(this, patient);
+			// this.doEndFstAssessment(this, patient);
 
 		}
 		System.out.println(doctor.getId() + " will decide what to do next");
-		
-		System.out.println(this.getId() + " has finished fst assessment and  has removed " + patient.getId() + " from his multitasking.  " );
-		System.out.println("My multitasking factor is " + this.multiTaskingFactor);
-		printElementsArray(this.patientsInMultiTask, " patients in multitasking");
-		System.out.println(this.getId() + "has available = " + this.getAvailable());
-		//Para mover paciente de la lista de espera.
+
+		System.out.println(this.getId()
+				+ " has finished fst assessment and  has removed "
+				+ patient.getId() + " from his multitasking.  ");
+		System.out.println("My multitasking factor is "
+				+ this.multiTaskingFactor);
+		printElementsArray(this.patientsInMultiTask,
+				" patients in multitasking");
+		System.out.println(this.getId() + "has available = "
+				+ this.getAvailable());
+		// Para mover paciente de la lista de espera.
 		movePatientBedReassessment(doctor);
+		System.out.println(doctor.getId()
+				+ " is moving to doctors area at end first assessment");
 		doctor.moveToDoctorsArea();
 		doctor.decideWhatToDoNext();
 
 	}
 
 	public void movePatientBedReassessment(Doctor doctor) {
-		if (patientsWaitingForCubicle.size() > 0){
+		if (patientsWaitingForCubicle.size() > 0) {
 			Patient patientWaiting = patientsWaitingForCubicle.get(0);
 			Resource bed = doctor.findBed(patientWaiting.getTriageNum());
-			if (bed != null){
+			if (bed != null) {
 				patientsWaitingForCubicle.remove(patientWaiting);
 				patientWaiting.setMyBedReassessment(bed);
 				patientWaiting.getMyBedReassessment().setAvailable(false);
-				patientWaiting.moveBackToBed(bed);				
+				patientWaiting.moveBackToBed(bed);
 			}
 		}
 	}
-	
-	
-	public void removePatientFromDepartment(Patient patient){
+
+	public void removePatientFromDepartment(Patient patient) {
 
 		printTime();
 		System.out
 				.println(patient.getId()
 						+ " has finished first assessment and does not need anything else: IS LEAVING THE DEPATMENT");
-		System.out.println("method remove patient from dep " + this.getId() + " is setting " + patient.getMyResource().getId() + " available= true");
+		System.out.println("method remove patient from dep " + this.getId()
+				+ " is setting " + patient.getMyResource().getId()
+				+ " available= true");
 		patient.getMyResource().setAvailable(true);
 		patient.setMyResource(null);
 		patient.setMyBedReassessment(null);
-		
-		
+
 		printTime();
 		System.out.println(patient.getId() + " goes to qTrolley");
 		patient.addToQ("qTrolley ");
 		patient.getTimeInSystem();
-		System.out.println(patient.getId() + " has finished first assessment and is leaving the depatment. His time in system is:  " + patient.getTimeInSystem());
+		System.out
+				.println(patient.getId()
+						+ " has finished first assessment and is leaving the depatment. His time in system is:  "
+						+ patient.getTimeInSystem());
 		patient.setIsInSystem(false);
 		printTime();
 		System.out.println(patient.getId() + " has left  the department");
-		
-		
-		
-		
+
 		patient.getTimeInSystem();
 		// TODO cambiar esto para pasarlos al trolley
 		System.out.println(" resource and doctor  about to get released");
@@ -1847,147 +1880,141 @@ public class Doctor extends General {
 
 		this.setMyResource(null);
 		this.myPatientsInBedRemove(patient);
-		if (this.myPatientsBackInBed.contains(patient)){
+		if (this.myPatientsBackInBed.contains(patient)) {
 			this.myPatientsBackInBed.remove(patient);
 		}
-		
-		
-		
+
 		System.out.println(this.getId() + " will move to doctors area"
 				+ " method: endFstAssessment"
-				+ " this method is being called by " + this.getId());		
-		
-
-		
+				+ " this method is being called by " + this.getId());
 
 		// TODO cambiar esto para pasarlos al troley
 
-	
-		
-		
 	}
-	
-	@Watch(watcheeClassName = "AESim.Patient", watcheeFieldNames = "backInBed",/* triggerCondition = "$watcher.getNumAvailable()>0",*/ whenToTrigger = WatcherTriggerSchedule.IMMEDIATE, scheduleTriggerPriority = 60, pick = 1)
+
+	@Watch(watcheeClassName = "AESim.Patient", watcheeFieldNames = "backInBed",/*
+																				 * triggerCondition
+																				 * =
+																				 * "$watcher.getNumAvailable()>0"
+																				 * ,
+																				 */whenToTrigger = WatcherTriggerSchedule.IMMEDIATE, scheduleTriggerPriority = 60, pick = 1)
 	public void startReassessmentWatcher(Patient watchedAgent) {
-		System.out.println("\n start reassessment by watcher " + watchedAgent.getId() +" and "+this.getId());
-//				this.startReassessment(watchedAgent);
-//		if (this.myPatientsBackInBed.contains(watchedAgent)){
-//			this.startInitAssessment(watchedAgent);
-//		}
-//		else
-		if (this.getAvailable()){
-		if (this.myPatientsBackInBed.contains(watchedAgent)){
-			this.doReassessment(watchedAgent);
+		System.out.println("\n start reassessment by watcher "
+				+ watchedAgent.getId() + " and " + this.getId());
+		// this.startReassessment(watchedAgent);
+		// if (this.myPatientsBackInBed.contains(watchedAgent)){
+		// this.startInitAssessment(watchedAgent);
+		// }
+		// else
+		if (this.getAvailable()) {
+			if (this.myPatientsBackInBed.contains(watchedAgent)) {
+				this.doReassessment(watchedAgent);
+			}
+
+			else
+				this.decideWhatToDoNext();
+
 		}
-		
-		else this.decideWhatToDoNext();
-	
 
 	}
-	
-	}
-	
-	
+
 	public void startReassessment(Patient watchedAgent) {
-		
-		if (this.myPatientsBackInBed.contains(watchedAgent)){
+
+		if (this.myPatientsBackInBed.contains(watchedAgent)) {
 			this.doReassessment(watchedAgent);
 		}
-		
+
 		else {
 			watchedAgent.getMyDoctor().doReassessment(watchedAgent);
 		}
-		
 
 	}
 
-	public void doReassessment(Patient patientBackInBed){
+	public void doReassessment(Patient patientBackInBed) {
 
-System.out.println(this.getId() + " is DOING reassessment to " + patientBackInBed.getId());
+		System.out.println(this.getId() + " is DOING reassessment to "
+				+ patientBackInBed.getId());
 		printTime();
-		if (this.myPatientsBackInBed.contains(patientBackInBed)){
-			this.myPatientsBackInBed.remove(patientBackInBed);}
-		
-		System.out.println("       \n \nSTART RE-ASSESSMENT  "
-				+ this.getId() + " and " + patientBackInBed.getId());
+		if (this.myPatientsBackInBed.contains(patientBackInBed)) {
+			this.myPatientsBackInBed.remove(patientBackInBed);
+		}
+
+		System.out.println("       \n \nSTART RE-ASSESSMENT  " + this.getId()
+				+ " and " + patientBackInBed.getId());
 		printTime();
 		System.out.println(patientBackInBed.getId() + " is at "
-				+ patientBackInBed.getMyBedReassessment().getId()
-				+ " loc " + patientBackInBed.getLoc(grid));
+				+ patientBackInBed.getMyBedReassessment().getId() + " loc "
+				+ patientBackInBed.getLoc(grid));
 
 		Resource bedPatient = patientBackInBed.getMyBedReassessment();
 		printTime();
-		System.out.println(this.getId() + " will go to "
-				+ bedPatient.getId());
+		System.out.println(this.getId() + " will go to " + bedPatient.getId());
 		GridPoint loc = patientBackInBed.getLoc(grid);
 		this.moveTo(grid, loc);
 		printTime();
-		System.out.println(this.getId() + " moves to "
-				+ bedPatient.getId());
+		System.out.println(this.getId() + " moves to " + bedPatient.getId());
 		this.setMyResource(bedPatient);
 		patientBackInBed.setMyResource(bedPatient);
-		System.out.println(this.getId() + " and "
-				+ patientBackInBed.getId() + " have as resource:"
-				+ bedPatient.getId());
-		System.out.println(this.getId() + " is setting " + bedPatient.getId() + " available= false");
+		System.out.println(this.getId() + " and " + patientBackInBed.getId()
+				+ " have as resource:" + bedPatient.getId());
+		System.out.println(this.getId() + " is setting " + bedPatient.getId()
+				+ " available= false");
 		bedPatient.setAvailable(false);
 		this.setMultitask(true);
-		//this.setAvailable(false);
-		if (this.available) this.decideWhatToDoNext();
-		System.out.println(bedPatient.getId() + " and "
-				+ this.getId() + " are set not available");
+		// this.setAvailable(false);
+		if (this.available)
+			this.decideWhatToDoNext();
+		System.out.println(bedPatient.getId() + " and " + this.getId()
+				+ " are set not available");
 		printTime();
-		System.out.println(this.getId()
-				+ " will schedule end reassessment");
+		System.out.println(this.getId() + " will schedule end reassessment");
 		this.scheduleEndReassessment(this, patientBackInBed);
 
-
-	
-		
 	}
-	
-	
-	
+
 	public void scheduleEnd1stAssessment(Patient fstpatient) {
 		// System.out
 		// .println(" aquie está el metodo scheduleEnd1stAssessment(Patient fstpatient) ");
-//		double parameters[] = fstAssessmentParameters(fstpatient.getTriageNum());
-//		double serviceTime = triangularObs(parameters[0], parameters[1],
-//				parameters[2]);
-//		// System.out.println("triangularOBS :   " + serviceTime);
-//		ISchedule schedule = repast.simphony.engine.environment.RunEnvironment
-//				.getInstance().getCurrentSchedule();
-//
-//		// double timeEndService = schedule.getTickCount()
-//		// + serviceTime;
-//
-//		double timeEndService = schedule.getTickCount() + serviceTime;
-//		this.setNextEndingTime(timeEndService);
-//		ScheduleParameters scheduleParams = ScheduleParameters
-//				.createOneTime(timeEndService);
-//		EndFstAssessment action2 = new EndFstAssessment(this, fstpatient);
-//
-//		schedule.schedule(scheduleParams, action2);
-//
-//		System.out.println(" first assessment of " + fstpatient.getId()
-//				+ " schedule to end first assessment at " + timeEndService);
-		
+		// double parameters[] =
+		// fstAssessmentParameters(fstpatient.getTriageNum());
+		// double serviceTime = triangularObs(parameters[0], parameters[1],
+		// parameters[2]);
+		// // System.out.println("triangularOBS :   " + serviceTime);
+		// ISchedule schedule =
+		// repast.simphony.engine.environment.RunEnvironment
+		// .getInstance().getCurrentSchedule();
+		//
+		// // double timeEndService = schedule.getTickCount()
+		// // + serviceTime;
+		//
+		// double timeEndService = schedule.getTickCount() + serviceTime;
+		// this.setNextEndingTime(timeEndService);
+		// ScheduleParameters scheduleParams = ScheduleParameters
+		// .createOneTime(timeEndService);
+		// EndFstAssessment action2 = new EndFstAssessment(this, fstpatient);
+		//
+		// schedule.schedule(scheduleParams, action2);
+		//
+		// System.out.println(" first assessment of " + fstpatient.getId()
+		// + " schedule to end first assessment at " + timeEndService);
+
 		double parameters[] = fstAssessmentParameters(fstpatient.getTriageNum());
-		double serviceTime=0;
-		if ((fstpatient.getTriage()=="Blue ")||(fstpatient.getTriage()=="Green ")){
+		double serviceTime = 0;
+		if ((fstpatient.getTriage() == "Blue ")
+				|| (fstpatient.getTriage() == "Green ")) {
 			serviceTime = distTriangular(parameters[0], parameters[1],
 					parameters[2]);
-//			this.iniAssessmentTSampleTriang.add(serviceTime);
-//			System.out.println(" init assessment sample triang: " + this.iniAssessmentTSampleTriang);
-		}
-		else{
-			serviceTime=distLognormal(parameters[0], parameters[1],
+			// this.iniAssessmentTSampleTriang.add(serviceTime);
+			// System.out.println(" init assessment sample triang: " +
+			// this.iniAssessmentTSampleTriang);
+		} else {
+			serviceTime = distLognormal(parameters[0], parameters[1],
 					parameters[2]);
-//			this.iniAssessmentTSampleLogn.add(serviceTime);
-//			System.out.println(" init assessment sample logn: " + this.iniAssessmentTSampleLogn);
+			// this.iniAssessmentTSampleLogn.add(serviceTime);
+			// System.out.println(" init assessment sample logn: " +
+			// this.iniAssessmentTSampleLogn);
 		}
-		
-		 
+
 		// System.out.println("triangularOBS :   " + serviceTime);
 		ISchedule schedule = repast.simphony.engine.environment.RunEnvironment
 				.getInstance().getCurrentSchedule();
@@ -2005,39 +2032,37 @@ System.out.println(this.getId() + " is DOING reassessment to " + patientBackInBe
 
 		System.out.println("\n\tFirst assessment of " + fstpatient.getId()
 				+ " schedule to end first assessment at " + timeEndService);
-		
-		
-		
-		
-		
-		
-		System.out.println(this.getId() + " has started first assessment and  has added " + fstpatient.getId() + " to his multitasking.  " );
-		System.out.println("My multitasking factor is " + this.multiTaskingFactor);
-		printElementsArray(this.patientsInMultiTask, " patients in multitasking");
-		System.out.println(this.getId() + "has available = " + this.getAvailable());
-		
+
+		System.out.println(this.getId()
+				+ " has started first assessment and  has added "
+				+ fstpatient.getId() + " to his multitasking.  ");
+		System.out.println("My multitasking factor is "
+				+ this.multiTaskingFactor);
+		printElementsArray(this.patientsInMultiTask,
+				" patients in multitasking");
+		System.out.println(this.getId() + "has available = "
+				+ this.getAvailable());
 
 	}
 
 	public void endReassessment(Patient patient) {
 		printTime();
-		Doctor doctor= null;
+		Doctor doctor = null;
 		printTime();
-		if (this.isInShift==false){
-			doctor=this.doctorToTakeOver();
-			
+		if (this.isInShift == false) {
+			doctor = this.doctorToTakeOver();
+
 		}
-		
+
 		else {
-			doctor= this;
+			doctor = this;
 		}
-		
+
 		int totalProcess = patient.getTotalProcesses();
-		patient.setTotalProcesses(totalProcess+1);
-		
-		
+		patient.setTotalProcesses(totalProcess + 1);
+
 		printTime();
-		
+
 		System.out
 				.println("*****                               \n \n END RE-ASSESSMENT "
 						+ doctor.getId()
@@ -2054,14 +2079,10 @@ System.out.println(this.getId() + " is DOING reassessment to " + patientBackInBe
 		System.out.println(" the bed to release is: "
 				+ resourceToRelease.getId());
 		// resourceToRelease.setAvailable(true);
-	//	patient.getMyResource().setAvailable(true);
-		
-	
-		
+		// patient.getMyResource().setAvailable(true);
+
 		doctor.setMyPatientCalling(null);
-		
-		
-		
+
 		if (doctor.getMyPatientsInBedTime().size() == doctor
 				.getMyPatientsInBedTriage().size()) {
 
@@ -2073,40 +2094,34 @@ System.out.println(this.getId() + " is DOING reassessment to " + patientBackInBe
 					.println(" \n ERROR: The lists patients in bed time and triage do not have the same objects");
 		}
 
-		
 		System.out.println(patient.getId()
 				+ " has finished reassessment and will go to qTrolley ");
 		patient.addToQ("qTrolley ");
 		System.out.println(" method end reassessment ");
-		
-		
-		
 
-		if (doctor.myPatientsBackInBed.contains(patient)){
-			doctor.myPatientsBackInBed.remove(patient);}
-		
+		if (doctor.myPatientsBackInBed.contains(patient)) {
+			doctor.myPatientsBackInBed.remove(patient);
+		}
+
 		patient.getTimeInSystem();
-		System.out.println(patient.getId() + " has finished first Re-assessment and is leaving the depatment. His time in system is:  " + patient.getTimeInSystem());
-	
-		
 		System.out
-		.println(this.getId() + " at end reassessment has assign to "
-				+ patient.getId() + " a null  doctor: "
-				+ patient.getMyDoctor());
+				.println(patient.getId()
+						+ " has finished first Re-assessment and is leaving the depatment. His time in system is:  "
+						+ patient.getTimeInSystem());
+
+		System.out
+				.println(this.getId() + " at end reassessment has assign to "
+						+ patient.getId() + " a null  doctor: "
+						+ patient.getMyDoctor());
 
 		System.out.println("method: endReassessment " + doctor.getId()
 				+ " has removed from patients in bed " + patient.getId());
-		
+
 		printTime();
 		System.out.println(patient.getId() + " has left the department ");
-		
-		
 
-		
-		
 		// TODO cambiar esto para pasarlos al trolley
 
-	
 		System.out.println(doctor.getId() + " is available? "
 				+ doctor.getAvailable() + resourceToRelease.getId()
 				+ " is available " + resourceToRelease.getAvailable());
@@ -2115,71 +2130,79 @@ System.out.println(this.getId() + " is DOING reassessment to " + patientBackInBe
 				.println(" doctor will move back to doctors area, method: endReassessment"
 						+ " this method is being called by " + this.getId());
 		this.patientsInMultiTask.remove(patient);
-		System.out.println(this.getId() + " has finished re-assessment and  has removed " + patient.getId() + " from his multitasking.  " );
+		System.out.println(this.getId()
+				+ " has finished re-assessment and  has removed "
+				+ patient.getId() + " from his multitasking.  ");
 		doctor.setMultitask(false);
-		System.out.println("My multitasking factor is " + this.multiTaskingFactor);
-		printElementsArray(this.patientsInMultiTask, " patients in multitasking");
-		System.out.println(this.getId() + "has available = " + this.getAvailable());
-		
+		System.out.println("My multitasking factor is "
+				+ this.multiTaskingFactor);
+		printElementsArray(this.patientsInMultiTask,
+				" patients in multitasking");
+		System.out.println(this.getId() + "has available = "
+				+ this.getAvailable());
+
 		doctor.setMyResource(null);
 		patient.setMyResource(null);
 		patient.setIsInSystem(false);
 		doctor.myPatientsInBedRemove(patient);
 		patient.setMyDoctor(null);
-		
-//		doctor.setAvailable(true);
-		
-		System.out.println("method end reassessment " + doctor.getId() + " is setting " + resourceToRelease.getId() + " available= true");
+
+		// doctor.setAvailable(true);
+
+		System.out.println("method end reassessment " + doctor.getId()
+				+ " is setting " + resourceToRelease.getId()
+				+ " available= true");
 		resourceToRelease.setAvailable(true);
-		if (resourceToRelease.getWhoBlockedMe()==patient){
+		if (resourceToRelease.getWhoBlockedMe() == patient) {
 			resourceToRelease.setWhoBlockedMe(null);
-			System.out.println(patient.getId() + "has unblocked " + resourceToRelease.getId());
+			System.out.println(patient.getId() + "has unblocked "
+					+ resourceToRelease.getId());
 		}
 		movePatientBedReassessment(doctor);
+		System.out.println(doctor.getId()
+				+ " is moving to doctors area at end re-assessment");
 		doctor.moveToDoctorsArea();
-		doctor.decideWhatToDoNext();		
+		doctor.decideWhatToDoNext();
 
 	}
 
-	
-	
-	public double getReassessmentTime(Patient patient){
-		double time=0;
-		double parameters[] = this.reassessmentParameters(patient.getTriageNum());
-		double min= parameters[0];
-		double mean= parameters[1];
-		double max= parameters[2];
-		if (patient.getWasInTest() || patient.getWasInXray()){
-//			time=distExponential(min, mean, max);
-			time= RandomHelper.createExponential(mean).nextDouble();
-//			this.reAssessmentTSampleExp.add(time);
-//			System.out.println(" reassessment sample exponential: " + reAssessmentTSampleExp);
+	public double getReassessmentTime(Patient patient) {
+		double time = 0;
+		double parameters[] = this.reassessmentParameters(patient
+				.getTriageNum());
+		double min = parameters[0];
+		double mean = parameters[1];
+		double max = parameters[2];
+		if (patient.getWasInTest() || patient.getWasInXray()) {
+			// time=distExponential(min, mean, max);
+			time = RandomHelper.createExponential(mean).nextDouble();
+			// this.reAssessmentTSampleExp.add(time);
+			// System.out.println(" reassessment sample exponential: " +
+			// reAssessmentTSampleExp);
+		} else {
+			time = distLognormal(min, mean, max);
+			// this.reAssessmentTSampleLogn.add(time);
+			// System.out.println(" reassessment sample lognormal: " +
+			// reAssessmentTSampleLogn);
 		}
-		else{
-			time=distLognormal(min, mean, max);
-//			this.reAssessmentTSampleLogn.add(time);
-//			System.out.println(" reassessment sample lognormal: " + reAssessmentTSampleLogn);
-		}
-		
+
 		return time;
 	}
-	
-	
-	
-	
-	
+
 	public void scheduleEndReassessment(Doctor doctor, Patient fstpatient) {
 
 		printTime();
 		System.out.println(this.getId()
 				+ " is scheduling the end of reassessment between: "
 				+ doctor.getId() + " and " + fstpatient.getId());
-//		double parameters[] = reassessmentParameters(fstpatient.getTriageNum());
-//		System.out.println("params are: " + parameters[0] + " " + parameters[2]
-//				+ " Doctor Type is " + doctor.doctorType + " triage is :  "
-//				+ fstpatient.getTriageNum());
-//		double serviceTime = distLognormal(parameters[0], parameters[1],
-//				parameters[2]);
+		// double parameters[] =
+		// reassessmentParameters(fstpatient.getTriageNum());
+		// System.out.println("params are: " + parameters[0] + " " +
+		// parameters[2]
+		// + " Doctor Type is " + doctor.doctorType + " triage is :  "
+		// + fstpatient.getTriageNum());
+		// double serviceTime = distLognormal(parameters[0], parameters[1],
+		// parameters[2]);
 		// System.out.println("triagular REA " + serviceTime);
 		ISchedule schedule = repast.simphony.engine.environment.RunEnvironment
 				.getInstance().getCurrentSchedule();
@@ -2187,7 +2210,8 @@ System.out.println(this.getId() + " is DOING reassessment to " + patientBackInBe
 		// double timeEndService = schedule.getTickCount()
 		// + serviceTime;
 
-		double timeEndService = schedule.getTickCount() + getReassessmentTime(fstpatient);
+		double timeEndService = schedule.getTickCount()
+				+ getReassessmentTime(fstpatient);
 		doctor.setNextEndingTime(timeEndService);
 		ScheduleParameters scheduleParams = ScheduleParameters
 				.createOneTime(timeEndService);
@@ -2196,10 +2220,15 @@ System.out.println(this.getId() + " is DOING reassessment to " + patientBackInBe
 
 		schedule.schedule(scheduleParams, action2);
 		this.patientsInMultiTask.add(fstpatient);
-		System.out.println(this.getId() + " has started re-assessment and  has added " + fstpatient.getId() + " to his multitasking.  " );
-		System.out.println("My multitasking factor is " + this.multiTaskingFactor);
-		printElementsArray(this.patientsInMultiTask, " patients in multitasking");
-		System.out.println(this.getId() + " has available = " + this.getAvailable());
+		System.out.println(this.getId()
+				+ " has started re-assessment and  has added "
+				+ fstpatient.getId() + " to his multitasking.  ");
+		System.out.println("My multitasking factor is "
+				+ this.multiTaskingFactor);
+		printElementsArray(this.patientsInMultiTask,
+				" patients in multitasking");
+		System.out.println(this.getId() + " has available = "
+				+ this.getAvailable());
 		System.out.println(fstpatient.getId()
 				+ " expected to end reassessment at " + timeEndService);
 
@@ -2359,7 +2388,7 @@ System.out.println(this.getId() + " is DOING reassessment to " + patientBackInBe
 		return parameters;
 	}
 
-	public  int getNumAvailable() {
+	public int getNumAvailable() {
 		return numAvailable;
 	}
 
@@ -2433,100 +2462,97 @@ System.out.println(this.getId() + " is DOING reassessment to " + patientBackInBe
 
 	// GETTERS AND SETTERS
 
-	public  Resource getMyResource() {
+	public Resource getMyResource() {
 		return myResource;
 	}
 
-	public  Boolean getAvailable() {
+	public Boolean getAvailable() {
 		return this.available;
 	}
-	
+
 	/*
 	 * 
 	 */
-	public void setMultitask(boolean startSomethingWithAPatient){
-//		int numInMultiT = this.patientsInMultiTask.size();
-//		if (this.available) {
-//			
-//			if (numInMultiT < this.multiTaskingFactor) {
-//				this.numAvailable += 1;
-//			}
-//
-//		} else {
-//			this.numAvailable -= 1;
-//			if (this.numAvailable > 0) {
-//				if (numInMultiT < this.multiTaskingFactor) {
-//					this.setAvailable(true);
-//				}
-//			}
-//		}
-		if (this.patientsInMultiTask.size() > this.multiTaskingFactor){
+	public void setMultitask(boolean startSomethingWithAPatient) {
+		// int numInMultiT = this.patientsInMultiTask.size();
+		// if (this.available) {
+		//
+		// if (numInMultiT < this.multiTaskingFactor) {
+		// this.numAvailable += 1;
+		// }
+		//
+		// } else {
+		// this.numAvailable -= 1;
+		// if (this.numAvailable > 0) {
+		// if (numInMultiT < this.multiTaskingFactor) {
+		// this.setAvailable(true);
+		// }
+		// }
+		// }
+		if (this.patientsInMultiTask.size() > this.multiTaskingFactor) {
 			System.out.println("Wait!");
 		}
-		if (startSomethingWithAPatient){
+		if (startSomethingWithAPatient) {
 			this.numAvailable -= 1;
 			if (this.numAvailable == 0) {
 				this.setAvailable(false);
 			}
 		} else {
-			if (this.numAvailable < this.multiTaskingFactor){
+			if (this.numAvailable < this.multiTaskingFactor) {
 				this.numAvailable += 1;
 				setAvailable(true);
 			}
 		}
-		
-		
+
 	}
-	
+
 	public void setAvailable(boolean available) {
 		this.available = available;
-//		int numInMultiT = this.patientsInMultiTask.size();
-//		if (numInMultiT < this.multiTaskingFactor) {
-//			this.available=true;}
+		// int numInMultiT = this.patientsInMultiTask.size();
+		// if (numInMultiT < this.multiTaskingFactor) {
+		// this.available=true;}
 
 	}
-	
-	
-//	public void setAvailable(Boolean available) {
-//		this.available = available;
-//		if (this.available){
-//			if (startShift){
-//				this.numAvailable = this.multiTaskingFactor;
-//				int numInMultiT= this.patientsInMultiTask.size();
-//			} else {
-////				if(this.numAvailable < this.multiTaskingFactor){
-////					this.numAvailable += 1;
-////					this.moveToDoctorsArea();
-////				}
-////			}
-//				if (this.numAvailable == 0){					
-//					this.numAvailable += 1;
-//				} else {
-//					this.decideWhatToDoNext();
-//				}
-//			}
-//			if (!this.isBusy & this.numAvailable < this.multiTaskingFactor){
-//				this.numAvailable += 1;
-//			}
-//			
-//		} else { 
-//			this.numAvailable -= 1;
-//			startShift = false;
-//			if(this.numAvailable > 0){				
-//				this.setAvailable(true);
-//			}
-//		}
-////		if(this.available){
-////			this.numAvailable = 1;
-////		} else {
-////			this.numAvailable = 0;
-////		}
-////		
-//		
-//
-//	}
 
-	
+	// public void setAvailable(Boolean available) {
+	// this.available = available;
+	// if (this.available){
+	// if (startShift){
+	// this.numAvailable = this.multiTaskingFactor;
+	// int numInMultiT= this.patientsInMultiTask.size();
+	// } else {
+	// // if(this.numAvailable < this.multiTaskingFactor){
+	// // this.numAvailable += 1;
+	// // this.moveToDoctorsArea();
+	// // }
+	// // }
+	// if (this.numAvailable == 0){
+	// this.numAvailable += 1;
+	// } else {
+	// this.decideWhatToDoNext();
+	// }
+	// }
+	// if (!this.isBusy & this.numAvailable < this.multiTaskingFactor){
+	// this.numAvailable += 1;
+	// }
+	//
+	// } else {
+	// this.numAvailable -= 1;
+	// startShift = false;
+	// if(this.numAvailable > 0){
+	// this.setAvailable(true);
+	// }
+	// }
+	// // if(this.available){
+	// // this.numAvailable = 1;
+	// // } else {
+	// // this.numAvailable = 0;
+	// // }
+	// //
+	//
+	//
+	// }
+
 	public void setNumAvailable(int numAvailable) {
 		this.numAvailable = numAvailable;
 	}
@@ -3008,6 +3034,7 @@ System.out.println(this.getId() + " is DOING reassessment to " + patientBackInBe
 	public void setCanHelpAnotherDoctor(boolean canHelpAnotherDoctor) {
 		this.canHelpAnotherDoctor = canHelpAnotherDoctor;
 	}
+
 	public Doctor getDoctorToHandOver() {
 		return doctorToHandOver;
 	}
