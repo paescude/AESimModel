@@ -990,6 +990,7 @@ public class Doctor extends General {
 								.checkIfStartInitAssessment();
 						if (isStartInitAssessment==false) {
 							if (this.isAtDoctorArea==false){
+								System.out.println(this.getId()+ " is moving to docs area because when decide what to do has nothing to do ");
 								this.moveToDoctorsArea();
 							}
 						}
@@ -1074,7 +1075,7 @@ public class Doctor extends General {
 			System.out.println(this.getId()
 					+ " has nothing to do?, patients:"
 					+ this.getAllMyPatients());
-			System.out.println(this.getId() + " is available and...decides what to do");
+			System.out.println(this.getId() + " is available and...decides what to do, moving to docs area when start shift");
 			if (!this.isAtDoctorArea)this.moveToDoctorsArea();
 		}
 		return isStartInitAssessment;
