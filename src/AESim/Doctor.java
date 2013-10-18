@@ -1043,6 +1043,9 @@ public class Doctor extends General {
 
 	private Boolean checkIfStartInitAssessment() {
 		boolean isStartInitAssessment= false;
+		/*
+		 * Prueba 3
+		 */
 		Patient fstpatient = null;
 		Boolean flag = false;
 		// The head of the queue is at (x,y-1)
