@@ -1042,6 +1042,9 @@ public class Doctor extends General {
 	}
 
 	private Boolean checkIfStartInitAssessment() {
+		/*
+		 * Prueba de branches
+		 */
 		boolean isStartInitAssessment= false;
 		Patient fstpatient = null;
 		Boolean flag = false;
