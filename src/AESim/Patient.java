@@ -78,6 +78,9 @@ public class Patient extends General {
 	private Resource myBedReassessment;
 	private Doctor myDoctor;
 	private int numWasFstForAssess;
+	private Nurse myNurse;
+	private boolean goToResusRoom;
+	private boolean goToTreatRoom;
 
 
 	public Patient(Grid<Object> grid, String typeArrival, double time) {
@@ -120,9 +123,10 @@ public class Patient extends General {
 		this.testCountT=0;
 		this.setTotalProcesses(0);
 		this.timeEndCurrentService=0;
-		
+		this.myNurse = null;
 		this.waitInCublicle = true;
-		
+		this.goToResusRoom = false;
+		this.goToTreatRoom = false;
 		this.isWaitingBedReassessment = 0;
 	}
 	
@@ -261,6 +265,7 @@ public class Patient extends General {
 			System.out.println(" at end of test " + this.getId()
 					+ " has in mind the doctor " + doctor.getId());
 			this.moveTo(grid, bed.getLoc(grid));
+	
 			System.out.println(this.getId() + " has moved to bed reassessment "
 					+ bed.getId());
 
@@ -325,9 +330,12 @@ public class Patient extends General {
 
 		else {
 			Resource myBed = this.getMyBedReassessment();
-			this.moveBackToBed(myBed);			
+			this.moveBackToBed(myBed);		
+	
 			System.out.println(this.getId() + " is back to his bed reassessment "+ myBed.getId());
 		}
+		
+		this.getMyNurse().moveTo(grid, this.getLoc(grid));
 	}
 	
 
@@ -948,6 +956,41 @@ public class Patient extends General {
 
 	public void setWaitInCublicle(boolean waitInCublicle) {
 		this.waitInCublicle = waitInCublicle;
+	}
+
+
+
+	public void setMyNurse(Nurse nurse) {
+		// TODO Auto-generated method stub
+		this.myNurse = nurse;
+	}
+	
+	public Nurse getMyNurse(){
+		return this.myNurse;
+	}
+
+
+
+	public boolean isGoingToResusRoom() {
+		return goToResusRoom;
+	}
+
+
+
+	public void setGoToResusRoom(boolean goToResusRoom) {
+		this.goToResusRoom = goToResusRoom;
+	}
+
+
+
+	public boolean isGoingToTreatRoom() {
+		return goToTreatRoom;
+	}
+
+
+
+	public void setGoToTreatRoom(boolean goToTreatRoom) {
+		this.goToTreatRoom = goToTreatRoom;
 	}
 
 

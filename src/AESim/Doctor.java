@@ -19,6 +19,8 @@ import repast.simphony.space.grid.GridPoint;
 import cern.jet.random.Uniform;
 
 public class Doctor extends General {
+	
+	static final double PROB_ORANGE_PATIENT_IN_RESUS_ROOM = 0.8;
 	private static int count;
 	// private ArrayList<Double> doctorMemory []= new ArrayList[2];
 	// private PriorityQueue<Patient> memoryByTriage;
@@ -1502,12 +1504,12 @@ public class Doctor extends General {
 		System.out.println("      \n \n START FIRST ASSESSMENT  "
 				+ this.getId() + " & " + fstpatient.getId() + " \n");
 		double time = getTime();
-
 		int triage = fstpatient.getTriageNum();
 		// find the bed according to the patient's needs.
 		Resource rAvailable = findBed(triage);
-		if (rAvailable == null) {
-			System.out.println(" there is no bed available");
+		Nurse nurse = findNurse();
+		if (rAvailable == null || nurse == null) {
+			System.out.println(" there is no bed available or nurse");
 		} else {
 			// if there is a bed and it free, then
 			if (rAvailable.getAvailable()) {
@@ -1526,16 +1528,12 @@ public class Doctor extends General {
 						System.err
 								.println("ERROR:  there is already a patient in that bed: "
 										+ patientAlreadyInBed.getId());
-					}
-
-					else if (agentObject instanceof Doctor) {
+					} else if (agentObject instanceof Doctor) {
 						doctorAlreadyInBed = (Doctor) agentObject;
 						System.err
 								.println("ERROR: there is already a doctor in that bed: "
 										+ doctorAlreadyInBed.getId());
-
 					}
-
 				}
 				if (doctorAlreadyInBed != null && patientAlreadyInBed == null) {
 					System.err.println("\n ERROR: "
@@ -1550,6 +1548,7 @@ public class Doctor extends General {
 					printTime();
 					System.out.println(rAvailable.getId() + " is empty ");
 					grid.moveTo(this, locX, locY);
+					grid.moveTo(nurse, locX, locY);
 					grid.moveTo(fstpatient, locX, locY);
 					System.out.println(this.getId() + " & "
 							+ fstpatient.getId() + " have moved to "
@@ -1570,15 +1569,14 @@ public class Doctor extends General {
 							+ " will add to his patients in bed "
 							+ fstpatient.getId());
 					this.myPatientsInBedAdd(fstpatient);
-					this.patientsInMultiTask.add(fstpatient);
+					fstpatient.setMyNurse(nurse);
+					this.engageWithPatient(fstpatient);
+					nurse.engageWithPatient(fstpatient);
 					double x = this.getX1MyNumPatientsSeen();
 					x++;
 					this.setX1MyNumPatientsSeen(x);
-
 					printElementsQueue(this.myPatientsInBedTime,
-							" my patients in bed time");
-
-					this.setMultitask(true);
+							" my patients in bed time");					
 					printElementsArray(this.patientsInMultiTask,
 							" patients in multitasking");
 					// this.setAvailable(false);
@@ -1614,6 +1612,26 @@ public class Doctor extends General {
 			}
 		}
 		return startInitAssessment;
+	}
+
+	public void engageWithPatient(Patient fstpatient) {
+		this.patientsInMultiTask.add(fstpatient);
+		this.updateMultitask(true);
+	}
+
+	private Nurse findNurse() {
+		Nurse nurse = null;
+		for (int i = 7; i < 12; i++){
+			Object o = getGrid().getObjectAt(i,2);
+			if (o instanceof Nurse){
+				nurse = (Nurse)o;
+				if (nurse.getAvailable()){
+					break;
+				}
+				
+			}
+		}
+		return nurse;
 	}
 
 	private static class EndFstAssessment implements IAction {
@@ -1658,17 +1676,21 @@ public class Doctor extends General {
 		printTime();
 		doctor = chooseDocFstAssess(patient, doctor);
 		if (doctor != null) {
-
 			int totalProcess = patient.getTotalProcesses();
 			patient.setTotalProcesses(totalProcess + 1);
 			;
-			this.patientsInMultiTask.remove(patient);
-			doctor.setMultitask(false);
-
+			doctor.releaseFromPatient(patient);
 			// doctor decides what to do
 			int route[] = decideTests(patient.getTriageNum());
-			// Choose a route. A patient could go to test or not.
-			chooseRoute(patient, doctor, route);
+			/*
+			 * Choose a route. A patient could go to test or not.
+			 * 30% of patients are removed from department.
+			 */
+			if (patient.isGoingToTreatRoom()){
+				chooseRoute(patient, doctor, route);
+			} else {
+				this.removePatientFromDepartment(patient);
+			}			
 		} else {
 			System.err
 					.println(" ERROR: something is wrong here, no doctor to end fst assessment with "
@@ -1678,15 +1700,15 @@ public class Doctor extends General {
 		}
 		System.out.println(doctor.getId() + " will decide what to do next");
 
-		System.out.println(this.getId()
+		System.out.println(doctor.getId()
 				+ " has finished fst assessment and  has removed "
 				+ patient.getId() + " from his multitasking.  ");
 		System.out.println("My multitasking factor is "
-				+ this.multiTaskingFactor);
-		printElementsArray(this.patientsInMultiTask,
+				+ doctor.multiTaskingFactor);
+		printElementsArray(doctor.patientsInMultiTask,
 				" patients in multitasking");
-		System.out.println(this.getId() + "has available = "
-				+ this.getAvailable());
+		System.out.println(doctor.getId() + "has available = "
+				+ doctor.getAvailable());
 		// Para mover paciente de la lista de espera.
 		movePatientBedReassessment(doctor);
 		System.out.println(doctor.getId()
@@ -1702,7 +1724,7 @@ public class Doctor extends General {
 			this.removePatientFromDepartment(patient);
 			System.out.println("method end fst assessment " + this.getId()
 					+ " is setting " + resourceToRelease.getId()
-					+ " available= true");
+					+ " available = true");
 			resourceToRelease.setAvailable(true);
 		} else {
 			if (Math.random() < 0.1 && patient.getTriageNum() != 5) {
@@ -1710,7 +1732,7 @@ public class Doctor extends General {
 				System.out.println("method end fst assessment "
 						+ this.getId() + " is setting "
 						+ resourceToRelease.getId()
-						+ " available= true, becasue " + patient.getId()
+						+ " available= true, because " + patient.getId()
 						+ " does not wait for test in bed");
 				resourceToRelease.setAvailable(true);
 				patient.setWaitInCublicle(false);
@@ -1726,15 +1748,14 @@ public class Doctor extends General {
 						+ patient.getMyBedReassessment().getId()
 						+ " as my bed reassessment ");
 			}
-			patient.setMyDoctor(doctor);
+//			patient.setMyDoctor(doctor);
 			printTime();
 			System.out.println(patient.getId()
 					+ " keeps in mind that his assigned doctor is  "
 					+ patient.getMyDoctor().getId());
 
 			doctor.setMyResource(null);
-			doctor.setMultitask(false);
-			// this.setAvailable(true);
+			doctor.updateMultitask(false);
 			printTime();
 			System.out.println("method: endFstAssessment" + doctor.getId()
 					+ " will remove from list of patients in bed "
@@ -1869,7 +1890,7 @@ public class Doctor extends General {
 		patient.getMyResource().setAvailable(true);
 		patient.setMyResource(null);
 		patient.setMyBedReassessment(null);
-
+		patient.getMyNurse().releaseFromPatient(patient);
 		printTime();
 		System.out.println(patient.getId() + " goes to qTrolley");
 		patient.addToQ("qTrolley ");
@@ -1972,9 +1993,7 @@ public class Doctor extends General {
 		System.out.println(this.getId() + " is setting " + bedPatient.getId()
 				+ " available= false");
 		bedPatient.setAvailable(false);
-		this.patientsInMultiTask.add(patientBackInBed);
-		this.setMultitask(true);
-		// this.setAvailable(false);
+		this.engageWithPatient(patientBackInBed);
 		if (this.available)
 			this.decideWhatToDoNext();
 		System.out.println(bedPatient.getId() + " and " + this.getId()
@@ -2064,13 +2083,9 @@ public class Doctor extends General {
 		printTime();
 		if (this.isInShift == false) {
 			doctor = this.doctorToTakeOver();
-
-		}
-
-		else {
+		} else {
 			doctor = this;
 		}
-
 		int totalProcess = patient.getTotalProcesses();
 		patient.setTotalProcesses(totalProcess + 1);
 
@@ -2123,7 +2138,7 @@ public class Doctor extends General {
 						+ patient.getTimeInSystem());
 
 		System.out
-				.println(this.getId() + " at end reassessment has assign to "
+				.println(doctor.getId() + " at end reassessment has assign to "
 						+ patient.getId() + " a null  doctor: "
 						+ patient.getMyDoctor());
 
@@ -2141,24 +2156,25 @@ public class Doctor extends General {
 		// grid.moveTo(doctor, doctor.initPosX, doctor.initPosY);
 		System.out
 				.println(" doctor will move back to doctors area, method: endReassessment"
-						+ " this method is being called by " + this.getId());
-		this.patientsInMultiTask.remove(patient);
-		System.out.println(this.getId()
+						+ " this method is being called by " + doctor.getId());
+		doctor.releaseFromPatient(patient);
+		patient.getMyNurse().releaseFromPatient(patient);
+		System.out.println(doctor.getId()
 				+ " has finished re-assessment and  has removed "
 				+ patient.getId() + " from his multitasking.  ");
-		doctor.setMultitask(false);
+		
 		System.out.println("My multitasking factor is "
-				+ this.multiTaskingFactor);
-		printElementsArray(this.patientsInMultiTask,
+				+ doctor.multiTaskingFactor);
+		printElementsArray(doctor.patientsInMultiTask,
 				" patients in multitasking");
-		System.out.println(this.getId() + "has available = "
-				+ this.getAvailable());
-
+		System.out.println(doctor.getId() + "has available = "
+				+ doctor.getAvailable());
 		doctor.setMyResource(null);
 		patient.setMyResource(null);
 		patient.setIsInSystem(false);
 		doctor.myPatientsInBedRemove(patient);
 		patient.setMyDoctor(null);
+		
 
 		// doctor.setAvailable(true);
 
@@ -2177,6 +2193,11 @@ public class Doctor extends General {
 		doctor.moveToDoctorsArea();
 		doctor.decideWhatToDoNext();
 
+	}
+
+	public void releaseFromPatient(Patient patient) {
+		this.patientsInMultiTask.remove(patient);
+		this.updateMultitask(false);
 	}
 
 	public double getReassessmentTime(Patient patient) {
@@ -2262,6 +2283,11 @@ public class Doctor extends General {
 			}
 			break;
 		case 4:
+			double rndResus = RandomHelper.createUniform().nextDouble();
+			if (rndResus < PROB_ORANGE_PATIENT_IN_RESUS_ROOM){
+				resource = findResourceAvailable("resus cubicle ");
+				break;
+			}
 			resource = findResourceAvailable("major cubicle ");
 			if (resource == null) {
 				resource = findResourceAvailable("minor cubicle ");
@@ -2482,28 +2508,7 @@ public class Doctor extends General {
 		return this.available;
 	}
 
-	/*
-	 * 
-	 */
-	public void setMultitask(boolean startSomethingWithAPatient) {
-		// int numInMultiT = this.patientsInMultiTask.size();
-		// if (this.available) {
-		//
-		// if (numInMultiT < this.multiTaskingFactor) {
-		// this.numAvailable += 1;
-		// }
-		//
-		// } else {
-		// this.numAvailable -= 1;
-		// if (this.numAvailable > 0) {
-		// if (numInMultiT < this.multiTaskingFactor) {
-		// this.setAvailable(true);
-		// }
-		// }
-		// }
-		if (this.patientsInMultiTask.size() > this.multiTaskingFactor) {
-			System.out.println("Wait!");
-		}
+	public void updateMultitask(boolean startSomethingWithAPatient) {
 		if (startSomethingWithAPatient) {
 			this.numAvailable -= 1;
 			if (this.numAvailable == 0) {
@@ -2520,10 +2525,6 @@ public class Doctor extends General {
 
 	public void setAvailable(boolean available) {
 		this.available = available;
-		// int numInMultiT = this.patientsInMultiTask.size();
-		// if (numInMultiT < this.multiTaskingFactor) {
-		// this.available=true;}
-
 	}
 
 	// public void setAvailable(Boolean available) {

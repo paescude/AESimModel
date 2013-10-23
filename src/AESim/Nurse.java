@@ -1,6 +1,8 @@
 package AESim;
 
 
+import java.util.ArrayList;
+
 import repast.simphony.engine.schedule.IAction;
 import repast.simphony.engine.schedule.ISchedule;
 import repast.simphony.engine.schedule.ScheduleParameters;
@@ -14,6 +16,7 @@ import cern.jet.random.Uniform;
 
 public class Nurse extends General {
 
+	static final double PROB_BLUE_PATIENT_IN_TREATMENT = 0.7;
 	private static int countNurse = 1;
 	private Boolean available;
 	private Grid<Object> grid;
@@ -33,8 +36,10 @@ public class Nurse extends General {
 	private Object isCheckinPatients;
 	private float[] durationOfShift = new float[7];
 	private double nextEndingTime;
+	private int multiTaskingFactor;
+	public ArrayList<Patient> patientsInMultiTask;
 
-	public Nurse(Grid<Object> grid, int x1, int y1, int idNum) {
+	public Nurse(Grid<Object> grid, int x1, int y1, int idNum, int multiTasking) {
 		this.grid = grid;
 		this.setAvailable(true);
 		this.setId("nurse " + idNum);
@@ -44,7 +49,9 @@ public class Nurse extends General {
 		this.initPosY = y1;
 		this.myResource = null;
 		this.settTriage(nurseTriageParams);
+		this.multiTaskingFactor = multiTasking; 	
 		this.isCheckinPatients = false;
+		this.patientsInMultiTask = new ArrayList<Patient>();
 	}
 	@ScheduledMethod(start = 0, priority = 89, shuffle = false, pick = 1)
 	public void initNumNurses() {
@@ -184,10 +191,7 @@ public class Nurse extends General {
 					this.scheduleEndShift(timeEnding+5);
 				}
 			}
-		}
-	
-	
-	else if (requiredAtWork == 1) {
+		} else if (requiredAtWork == 1) {
 			// TODO here if (this.isInShift() == false) didn't have {}, i put
 			// them but needs to be checked
 			if (this.isInShift() == false) {
@@ -195,6 +199,7 @@ public class Nurse extends General {
 						+ " method: schedule work"
 						+ " this method is being called by " + this.getId());
 				grid.moveTo(this, this.initPosX, this.initPosY);
+				this.numAvailable = this.multiTaskingFactor;
 				this.setInShift(true);
 				this.setAvailable(true);
 				System.out.println(this.getId() + " is in shift and is available at "
@@ -204,7 +209,88 @@ public class Nurse extends General {
 
 	}
 	
+	public void decideWhatToDoNext(){
+		if (this.numAvailable == this.multiTaskingFactor && checkIfAnyForTriage()){
+			this.startTriage();
+		} else if (this.numAvailable > 0){
+			if (checkIfAnyForTriage()){
+				
+			} else {
+				this.moveToNurseArea();
+			}			
+		}
+	}
 	
+	public void engageWithPatient(Patient patient){
+		this.patientsInMultiTask.add(patient);
+		this.updateMultitask(true);
+	}
+	
+	public void releaseFromPatient(Patient patient) {
+		this.patientsInMultiTask.remove(patient);
+		this.updateMultitask(false);
+		this.decideWhatToDoNext();
+	}
+	
+	private void moveToNurseArea() {
+		if (this.patientsInMultiTask.size() < this.multiTaskingFactor) {			
+				boolean flag = false;
+				int y = 2;
+				int x;
+				for (int j = 0; j < 2; j++) {
+					for (int i = 1; i < 6; i++) {
+						Object o = grid.getObjectAt(i + 6, y + j);
+						if (o == null) {
+							x = i + 6;
+							grid.moveTo(this, x, y + j);
+							System.out.println(this.getId()
+									+ " has moved to nurses area "
+									+ this.getLoc(grid).toString()
+									+ " at time " + getTime());
+							flag = true;
+							break;
+						}
+						if (flag) {
+							break;
+						}
+					}
+					if (flag) {
+						break;
+					}
+				}
+			this.setInShift(true);
+			this.setAvailable(true);
+			System.out.println(this.getId()
+					+ " is in shift and is available at " + getTime());
+			// this.decideWhatToDoNext();
+		} else {
+			this.setAvailable(false);
+		}		
+	}
+	
+	public boolean checkIfAnyForTriage(){
+		Object o = getGrid().getObjectAt(2,2);
+		if (o instanceof Patient){
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public void updateMultitask(boolean startSomethingWithAPatient) {
+		if (startSomethingWithAPatient) {
+			this.numAvailable -= 1;
+			if (this.numAvailable == 0) {
+				this.setAvailable(false);
+			}
+		} else {
+			if (this.numAvailable < this.multiTaskingFactor) {
+				this.numAvailable += 1;
+				this.setAvailable(true);
+			}
+		}
+
+	}
 	
 	
 	public void scheduleEndShift(double timeEnding) {
@@ -292,24 +378,18 @@ public class Nurse extends General {
 	printTime();
 	System.out.println("end triage " + patient.getId());
 
-
-		
-
-		grid.moveTo(nurse, this.initPosX, this.initPosY);
-		System.out.println(this.getId() + " has finished triage and has move back to nurses area" );
 		// grid.moveTo(patient,locQueue.getX(), locQueue.getY() );
-		
-		
+				
 		this.getMyResource().setAvailable(true);
 		this.setMyResource(null);
 		patient.setMyResource(null);
-		this.setNumAvailable(1);
 		System.out.println(patient.getId() + " will get triage category");
 		nurse.triage(patient);
 		int totalProcess = patient.getTotalProcesses();
 		patient.setTotalProcesses(totalProcess+1);
 		this.setAvailable(true);
-		startTriage();
+		this.setNumAvailable(this.multiTaskingFactor);		
+		this.decideWhatToDoNext();
 
 	}
 
@@ -352,6 +432,10 @@ public class Nurse extends General {
 				patient.setTriage("Blue ");
 				patient.setTriageNum(1);
 				patient.addToQ("qBlue ");
+				double rndTreat = RandomHelper.createUniform().nextDouble();
+				if (rndTreat < PROB_BLUE_PATIENT_IN_TREATMENT){
+					patient.setGoToTreatRoom(true);
+				}
 			} else if (probsTriage[0][0] < rnd && rnd <= probsTriage[1][0]) {
 				patient.setTriage("Green ");
 				patient.setTriageNum(2);
@@ -386,7 +470,7 @@ public class Nurse extends General {
 		
 	}
 
-	@Watch(watcheeClassName = "AESim.Patient", watcheeFieldNames = "wasFirstInQueueTriage", triggerCondition = "$watcher.getNumAvailable()>0", whenToTrigger = WatcherTriggerSchedule.IMMEDIATE, pick = 1)
+	@Watch(watcheeClassName = "AESim.Patient", watcheeFieldNames = "wasFirstInQueueTriage", triggerCondition = "$watcher.getNumAvailable()==$watcher.getMultiTaskingFactor()", whenToTrigger = WatcherTriggerSchedule.IMMEDIATE, pick = 1)
 	public void startTriageWatch(Patient watchedPatient) {
 		System.out.println(this.getId()+ " is available? "  + this.getAvailable() + " num available "+ this.getNumAvailable()+ " entered start triage by watcher with: " + watchedPatient.getId() + " time: " + getTime());
 		this.startTriage();
@@ -396,7 +480,7 @@ public class Nurse extends General {
 		printTime();
 		double time = getTime();
 		Resource rAvailable = findResourceAvailable("triage cubicle ");
-
+		
 		if (rAvailable != null) {
 			GridPoint loc = rAvailable.getLoc(grid);
 			int locX = loc.getX();
@@ -421,10 +505,9 @@ public class Nurse extends General {
 						queue.elementsInQueue();
 						patientToRemove.setIsFirstInQueueTriage(false);
 						// queue.getSize();
-
+						this.setNumAvailable(0);
 						this.setAvailable(false);
 						rAvailable.setAvailable(false);
-						this.setNumAvailable(0);
 						System.out.println("Start triage " + fstpatient.getId() + " with " + this.getId());
 
 						scheduleEndTriage(fstpatient);
@@ -460,13 +543,6 @@ public class Nurse extends General {
 
 	private void setAvailable(boolean b) {
 		this.available = b;
-		if (available){
-			this.numAvailable=1;
-		}
-		else{
-			this.numAvailable=0;
-		}
-
 	}
 
 	public static void initSaticVars() {
@@ -524,8 +600,20 @@ public class Nurse extends General {
 	public float[][] getMyShiftMatrix() {
 		return myShiftMatrix;
 	}
+	public int getMultiTaskingFactor() {
+		return multiTaskingFactor;
+	}
+	public void setMultiTaskingFactor(int multiTaskingFactor) {
+		this.multiTaskingFactor = multiTaskingFactor;
+	}
 	public void setMyShiftMatrix(float[][] myShiftMatrix) {
 		this.myShiftMatrix = myShiftMatrix;
 	}
-
+	public ArrayList<Patient> getPatientsInMultiTask() {
+		return patientsInMultiTask;
+	}
+	public void setPatientsInMultiTask(ArrayList<Patient> patientsInMultiTask) {
+		this.patientsInMultiTask = patientsInMultiTask;
+	}
+	
 }

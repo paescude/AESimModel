@@ -152,6 +152,8 @@ this.freeCount=0;
 					fstpatient.increaseTestCounterXray();
 					// grid.moveTo(this, locX, locY);
 					grid.moveTo(fstpatient, locX, locY);
+					grid.moveTo(fstpatient.getMyNurse(), locX, locY);
+
 					System.out
 							.println(fstpatient.getId()
 									+ " hast moved to "
@@ -324,6 +326,7 @@ this.freeCount=0;
 						fstpatient.increaseTestCounterTest();
 						// grid.moveTo(this, locX, locY);
 						grid.moveTo(fstpatient, locX, locY);
+						grid.moveTo(fstpatient.getMyNurse(), locX, locY);
 
 						fstpatient.setMyResource(rAvailable);
 

@@ -331,13 +331,6 @@ public class General {
 					break;
 				} else {
 					General g= resource.checkWhoInResource();
-//					if (g!=null){
-//						if (!(g instanceof Resource)){
-//							
-//						}
-//					
-//					}
-//					
 				}
 			}
 		}

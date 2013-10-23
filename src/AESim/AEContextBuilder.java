@@ -160,7 +160,7 @@ public class AEContextBuilder implements ContextBuilder<Object> {
 
 		// int nurseInitial = (Integer) params.getValue("nurse_count");
 		for (int i = 1; i <= nurseInitial; i++) {
-			Nurse nurse = new Nurse(grid, i + 7, 2, i);
+			Nurse nurse = new Nurse(grid, i + 7, 2, i, 2);
 			context.add(nurse);
 			grid.moveTo(nurse, 18, 4+i);
 			// grid.moveTo(nurse, 2, 3);
