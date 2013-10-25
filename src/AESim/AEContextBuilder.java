@@ -17,6 +17,7 @@ import repast.simphony.space.grid.WrapAroundBorders;
 
 public class AEContextBuilder implements ContextBuilder<Object> {
 
+
 	private static int currentRun;
 
 	@Override
@@ -53,7 +54,7 @@ public class AEContextBuilder implements ContextBuilder<Object> {
 		Nurse.initSaticVars();
 		Resource.initSaticVars();
 		Patient.initSaticVars();
-
+		
 		int triageCubicles = 5;
 		int trolleys = 10;
 //		int minorCubicles = 5; // this is the real numb =5
@@ -64,6 +65,7 @@ public class AEContextBuilder implements ContextBuilder<Object> {
 		int testRoom = 5;
 		int sHO = 9;
 		int consultant = 1;
+		int NurseMultitask = 4;
 		int patientInitial = 2;
 		int nurseInitial = 5 ;
 		int clerkInitial = 2;
@@ -160,7 +162,7 @@ public class AEContextBuilder implements ContextBuilder<Object> {
 
 		// int nurseInitial = (Integer) params.getValue("nurse_count");
 		for (int i = 1; i <= nurseInitial; i++) {
-			Nurse nurse = new Nurse(grid, i + 7, 2, i, 2);
+			Nurse nurse = new Nurse(grid, i + 7, 2, i, NurseMultitask);
 			context.add(nurse);
 			grid.moveTo(nurse, 18, 4+i);
 			// grid.moveTo(nurse, 2, 3);

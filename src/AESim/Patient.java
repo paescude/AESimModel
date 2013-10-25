@@ -81,6 +81,7 @@ public class Patient extends General {
 	private Nurse myNurse;
 	private boolean goToResusRoom;
 	private boolean goToTreatRoom;
+	private boolean comeFromTest;
 
 
 	public Patient(Grid<Object> grid, String typeArrival, double time) {
@@ -128,6 +129,7 @@ public class Patient extends General {
 		this.goToResusRoom = false;
 		this.goToTreatRoom = false;
 		this.isWaitingBedReassessment = 0;
+		this.comeFromTest = false;
 	}
 	
 
@@ -991,6 +993,18 @@ public class Patient extends General {
 
 	public void setGoToTreatRoom(boolean goToTreatRoom) {
 		this.goToTreatRoom = goToTreatRoom;
+	}
+
+
+
+	public boolean isComingFromTest() {
+		return comeFromTest;
+	}
+
+
+
+	public void setComeFromTest(boolean comeFromTest) {
+		this.comeFromTest = comeFromTest;
 	}
 
 
